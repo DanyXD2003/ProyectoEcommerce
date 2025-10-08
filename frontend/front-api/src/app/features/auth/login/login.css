@@ -1,0 +1,18 @@
+body, html {
+  height: 100%;
+  background-color: rgba(23, 115, 207, 0.25);
+}
+
+.card {
+  border-radius: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+input.form-control:focus {
+  box-shadow: 0 0 0 0.25rem rgba(23, 115, 207, 0.25);
+  border-color: #1773cf;
+}
+
+.text-primary {
+  color: #1773cf !important;
+}

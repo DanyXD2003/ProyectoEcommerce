@@ -1,0 +1,37 @@
+
+<div class="d-flex flex-column justify-content-center min-vh-100 p-3 bg-light text-dark">
+  <div class="mx-auto w-100" style="max-width: 400px;">
+    <div class="text-center mb-4">
+      <h1 class="fw-bold">Bienvenido de Nuevo</h1>
+      <p class="text-muted">Inicia sesión para continuar.</p>
+    </div>
+
+    <div class="card shadow-sm p-4">
+      <form (ngSubmit)="onSubmit()">
+        <!-- Email/Usuario -->
+        <div class="mb-3 position-relative">
+          <label for="email" class="form-label visually-hidden">Correo electrónico o usuario</label>
+          <input type="text" class="form-control ps-5" id="email" [(ngModel)]="email" name="email" placeholder="Correo electrónico o usuario" required>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="mb-3 position-relative">
+          <label for="password" class="form-label visually-hidden">Contraseña</label>
+          <input type="password" class="form-control ps-5" id="password" [(ngModel)]="password" name="password" placeholder="Contraseña" required>
+        </div>
+
+        <div class="text-end mb-3">
+          <a href="#" class="text-primary text-decoration-none">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 fw-bold">Iniciar sesión</button>
+      </form>
+    </div>
+
+    <div class="text-center mt-3">
+      <p class="text-muted mb-0">
+        ¿No tienes una cuenta? <a href="#" class="fw-medium text-primary text-decoration-none">Regístrate</a>
+      </p>
+    </div>
+  </div>
+</div>
