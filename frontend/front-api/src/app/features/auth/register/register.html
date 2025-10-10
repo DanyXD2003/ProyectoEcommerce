@@ -1,1 +1,60 @@
-<p>register works!</p>
+<div class="d-flex flex-column justify-content-center min-vh-100 p-3 bg-light text-dark">
+  <div class="mx-auto w-100" style="max-width: 450px;">
+    <div class="text-center mb-4">
+      <h1 class="fw-bold">Crear una Cuenta</h1>
+      <p class="text-muted">Únete para empezar a comprar.</p>
+    </div>
+
+    <div class="card shadow-sm p-4">
+      <form>
+        <!-- Nombre completo -->
+        <div class="mb-3 position-relative">
+          <label for="fullName" class="visually-hidden">Nombre completo</label>
+          <input type="text" id="fullName" class="form-control ps-5" placeholder="Nombre completo">
+        </div>
+
+        <!-- Correo -->
+        <div class="mb-3 position-relative">
+          <label for="email" class="visually-hidden">Correo electrónico</label>
+          <input type="email" id="email" class="form-control ps-5" placeholder="Correo electrónico">
+        </div>
+
+        <!-- Contraseña -->
+        <div class="mb-3 position-relative">
+          <label for="password" class="visually-hidden">Contraseña</label>
+          <input type="password" id="password" class="form-control ps-5" placeholder="Contraseña">
+        </div>
+
+        <!-- Confirmar contraseña -->
+        <div class="mb-3 position-relative">
+          <label for="confirmPassword" class="visually-hidden">Confirmar contraseña</label>
+          <input type="password" id="confirmPassword" class="form-control ps-5" placeholder="Confirmar contraseña">
+        </div>
+
+        <!-- Tipo de cuenta -->
+        <div class="mb-4">
+          <label class="form-label text-muted">Tipo de cuenta</label>
+          <div class="d-flex gap-4">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="accountType" id="customer" value="customer" checked>
+              <label class="form-check-label" for="customer">Cliente</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="accountType" id="admin" value="admin">
+              <label class="form-check-label" for="admin">Administrador</label>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 fw-bold py-2">Registrarse</button>
+      </form>
+    </div>
+
+    <div class="text-center mt-3">
+      <p class="text-muted mb-0">
+        ¿Ya tienes una cuenta?
+        <a routerLink="/login" class="fw-medium text-primary text-decoration-none">Inicia sesión</a>
+      </p>
+    </div>
+  </div>
+</div>
