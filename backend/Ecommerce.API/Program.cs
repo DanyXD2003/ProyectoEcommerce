@@ -1,5 +1,9 @@
 using Ecommerce.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Ecommerce.Application.Mappers;
+using Ecommerce.Application.Services;
+using Ecommerce.Domain.Repositories;
+using Ecommerce.Infrastructure.Repositories;    
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +16,15 @@ builder.Services.AddDbContext<EcommerceDbContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// AutoMappers
+builder.Services.AddAutoMapper(typeof(UsuarioProfile));
+
+// Controladores
+builder.Services.AddScoped<UsuarioService>();
+
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+
 
 // CORS dev (opcional)
 builder.Services.AddCors(options =>
