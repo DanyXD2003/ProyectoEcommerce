@@ -1,7 +1,3 @@
-# Build results
-bin/
-obj/
-
 # User-specific files
 *.user
 *.rsuser
@@ -10,23 +6,15 @@ obj/
 *.sln.docstates
 
 # IDE settings
-.vscode/
-.idea/
 *.DotSettings
 
-# Visual Studio cache/options
-.vs/
-.vscode/
-
 # Auto-generated files
-launchSettings.json
 appsettings.Development.json
 
 # Dependency directories
 node_modules/
 dist/
 .env
-.vscode/
 .angular/
 
 # Build artifacts
@@ -37,10 +25,6 @@ obj/
 .vs/
 .vscode/
 .idea/
-
-# Configuraciones locales de entorno
-appsettings.Development.json
-launchSettings.json
 
 # Otros
 *.user
