@@ -12,21 +12,32 @@ namespace Ecommerce.Infrastructure.Repositories
         public UsuarioRepository(EcommerceDbContext context) => _context = context;
 
         private static Usuario ToDomain(Infrastructure.Entities.usuario e) =>
-            new Usuario(e.id, e.nombre, e.correo, e.contraseña_hash, e.rol, e.fecha_registro);
+            // usar el constructor de rehidratación del dominio
+            new Usuario(
+                e.id_usuario,
+                e.nombre,
+                e.apellido,
+                e.correo,
+                e.contraseña_hash,
+                e.telefono,
+                e.rol,
+                e.fecha_registro);
 
         private static Infrastructure.Entities.usuario ToEntity(Usuario d) => new()
         {
-            id = d.Id,
+            id_usuario = d.Id,
             nombre = d.Nombre,
+            apellido = d.Apellido,
             correo = d.Correo,
             contraseña_hash = d.ContrasenaHash,
+            telefono = d.Telefono,
             rol = d.Rol,
             fecha_registro = d.FechaRegistro
         };
 
         public async Task<Usuario?> GetByIdAsync(int id)
         {
-            var e = await _context.usuarios.AsNoTracking().FirstOrDefaultAsync(x => x.id == id);
+            var e = await _context.usuarios.AsNoTracking().FirstOrDefaultAsync(x => x.id_usuario == id);
             return e is null ? null : ToDomain(e);
         }
 
@@ -52,7 +63,7 @@ namespace Ecommerce.Infrastructure.Repositories
 
         public async Task DeleteAsync(int id)
         {
-            var e = await _context.usuarios.FirstOrDefaultAsync(x => x.id == id);
+            var e = await _context.usuarios.FirstOrDefaultAsync(x => x.id_usuario == id);
             if (e is null) return;
             _context.usuarios.Remove(e);
             await _context.SaveChangesAsync();
