@@ -4,47 +4,57 @@ using Ecommerce.Domain.Repositories;
 using Ecommerce.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace Ecommerce.Infrastructure.Repositories
 {
     public class UsuarioRepository : IUsuarioRepository
     {
         private readonly EcommerceDbContext _context;
+        public UsuarioRepository(EcommerceDbContext context) => _context = context;
 
-        public UsuarioRepository(EcommerceDbContext context)
+        private static Usuario ToDomain(Infrastructure.Entities.usuario e) =>
+            new Usuario(e.id, e.nombre, e.correo, e.contraseña_hash, e.rol, e.fecha_registro);
+
+        private static Infrastructure.Entities.usuario ToEntity(Usuario d) => new()
         {
-            _context = context;
+            id = d.Id,
+            nombre = d.Nombre,
+            correo = d.Correo,
+            contraseña_hash = d.ContrasenaHash,
+            rol = d.Rol,
+            fecha_registro = d.FechaRegistro
+        };
+
+        public async Task<Usuario?> GetByIdAsync(int id)
+        {
+            var e = await _context.usuarios.AsNoTracking().FirstOrDefaultAsync(x => x.id == id);
+            return e is null ? null : ToDomain(e);
         }
 
         public async Task<Usuario?> GetByCorreoAsync(string correo)
         {
-            var entity = await _context.usuarios
-                .FirstOrDefaultAsync(u => u.correo == correo);
-
-            if (entity == null)
-                return null;
-
-            // Aquí hacemos el mapeo manual de la entidad (DB) al dominio
-            return new Usuario(entity.nombre, entity.correo, entity.contraseña_hash, entity.rol)
-            {
-                // Podés setear Id y FechaRegistro si querés mantenerlos
-                // Id = entity.Id,
-                // FechaRegistro = entity.FechaRegistro
-            };
+            var e = await _context.usuarios.AsNoTracking().FirstOrDefaultAsync(u => u.correo == correo);
+            return e is null ? null : ToDomain(e);
         }
 
         public async Task AddAsync(Usuario usuario)
         {
-            var entity = new Infrastructure.Entities.usuario
-            {
-                nombre = usuario.Nombre,
-                correo = usuario.Correo,
-                contraseña_hash = usuario.ContrasenaHash,
-                rol = usuario.Rol,
-                fecha_registro = usuario.FechaRegistro
-            };
+            _context.usuarios.Add(ToEntity(usuario));
+            await _context.SaveChangesAsync();
+        }
 
-            _context.usuarios.Add(entity);
+        public async Task UpdateAsync(Usuario usuario)
+        {
+            var e = ToEntity(usuario);
+            _context.usuarios.Attach(e);
+            _context.Entry(e).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var e = await _context.usuarios.FirstOrDefaultAsync(x => x.id == id);
+            if (e is null) return;
+            _context.usuarios.Remove(e);
             await _context.SaveChangesAsync();
         }
     }
