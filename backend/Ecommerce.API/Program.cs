@@ -22,28 +22,34 @@ builder.Services.AddAutoMapper(typeof(UsuarioProfile));
 
 // Controladores
 builder.Services.AddScoped<UsuarioService>();
-
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 
-
-// CORS dev (opcional)
+// CORS Configuration para Angular en localhost:4200
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("DevCors", policy =>
-        policy.AllowAnyOrigin()
+    options.AddPolicy("AngularLocalhost", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200", "https://localhost:4200")
               .AllowAnyHeader()
-              .AllowAnyMethod());
+              .AllowAnyMethod()
+              .AllowCredentials(); // Importante si usas cookies o autenticación
+    });
 });
 
 var app = builder.Build();
 
-app.UseSwagger();        // <- siempre
-app.UseSwaggerUI();      // <- siempre
+// Middleware pipeline
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
-app.UseCors("DevCors");
 
-// Expone controllers (Swagger detecta estos endpoints)
+// CORS debe ir después de UseHttpsRedirection y antes de UseAuthorization
+app.UseCors("AngularLocalhost");
+
+app.UseAuthorization();
+
+// Expone controllers
 app.MapControllers();
 
 app.Run();
