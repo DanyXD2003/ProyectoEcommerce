@@ -6,20 +6,24 @@ public class Categoria
     public string Nombre { get; private set; }
     public string? Descripcion { get; private set; }
 
-    // Relación con productos
     public List<Producto> Productos { get; private set; } = new();
 
-    // Constructor
+    // Crea una nueva categoría (sin Id aún)
     public Categoria(string nombre, string? descripcion = null)
     {
         if (string.IsNullOrWhiteSpace(nombre))
             throw new ArgumentException("El nombre de la categoría no puede estar vacío.");
-
         Nombre = nombre;
         Descripcion = descripcion;
     }
 
-    // Método para actualizar nombre
+    // 👇 NUEVO: rehidratación desde persistencia
+    public Categoria(int id, string nombre, string? descripcion = null)
+        : this(nombre, descripcion)
+    {
+        Id = id;
+    }
+
     public void CambiarNombre(string nuevoNombre)
     {
         if (string.IsNullOrWhiteSpace(nuevoNombre))
@@ -27,26 +31,17 @@ public class Categoria
         Nombre = nuevoNombre;
     }
 
-    // Método para actualizar descripción
-    public void CambiarDescripcion(string? nuevaDescripcion)
-    {
-        Descripcion = nuevaDescripcion;
-    }
+    public void CambiarDescripcion(string? nuevaDescripcion) => Descripcion = nuevaDescripcion;
 
-    // Método de dominio: agregar producto
     public void AgregarProducto(Producto producto)
     {
-        if (producto == null)
-            throw new ArgumentNullException(nameof(producto));
-
+        if (producto is null) throw new ArgumentNullException(nameof(producto));
         Productos.Add(producto);
     }
 
-    // Método de dominio: eliminar producto
     public void EliminarProducto(int productoId)
     {
-        var producto = Productos.FirstOrDefault(p => p.Id == productoId);
-        if (producto != null)
-            Productos.Remove(producto);
+        var p = Productos.FirstOrDefault(x => x.Id == productoId);
+        if (p != null) Productos.Remove(p);
     }
 }

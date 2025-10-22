@@ -11,7 +11,7 @@ namespace Ecommerce.Infrastructure.Repositories
         public CarritoRepository(EcommerceDbContext context) => _context = context;
 
         private static Carrito ToDomain(Infrastructure.Entities.carrito e) =>
-            new Carrito(e.id, e.usuario_id, e.activo);
+            new Carrito(e.id_carrito, e.id_usuario, e.activo);
 
         private static Infrastructure.Entities.carrito ToEntity(Carrito d) => new()
         {

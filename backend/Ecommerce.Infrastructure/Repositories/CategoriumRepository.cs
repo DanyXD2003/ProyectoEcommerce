@@ -1,51 +1,67 @@
 using Ecommerce.Domain.Entities;
 using Ecommerce.Domain.Repositories;
-using Ecommerce.Infrastructure.Data;  
+using Ecommerce.Infrastructure.Data;
+using Ecommerce.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.Infrastructure.Repositories
 {
-    public class CategoriumRepository : ICategoriumRepository
+    public class CategoriaRepository : ICategoriaRepository
     {
         private readonly EcommerceDbContext _context;
-        public CategoriumRepository(EcommerceDbContext context) => _context = context;
+        public CategoriaRepository(EcommerceDbContext context) => _context = context;
 
-        private static Categorium ToDomain(Infrastructure.Entities.categoria e) =>
-            new Categorium(e.id, e.nombre, e.descripcion, e.fecha_creacion);
+        // Infra -> Dominio
+        private static Categoria ToDomain(categorium e)
+            => new Categoria(e.id_categoria, e.nombre, e.descripcion);
 
-        private static Infrastructure.Entities.categoria ToEntity(Categorium d) => new()
+        // Dominio -> Infra
+        private static categorium ToEntity(Categoria d)
+            => new categorium
+            {
+                id_categoria = d.Id, // 0 si es nueva
+                nombre = d.Nombre,
+                descripcion = d.Descripcion
+            };
+
+        public async Task<Categoria?> GetByIdAsync(int id)
         {
-            id = d.Id,
-            nombre = d.Nombre,
-            descripcion = d.Descripcion,
-            fecha_creacion = d.FechaCreacion
-        };
-
-        public async Task<Categorium?> GetByIdAsync(int id)
-        {
-            var e = await _context.categorias.AsNoTracking().FirstOrDefaultAsync(x => x.id == id);
+            var set = _context.Set<categorium>();
+            var e = await set.AsNoTracking()
+                             .FirstOrDefaultAsync(x => x.id_categoria == id);
             return e is null ? null : ToDomain(e);
         }
 
-        public async Task AddAsync(Categorium categorium)
+        public async Task AddAsync(Categoria categoria)
         {
-            _context.categorias.Add(ToEntity(categorium));
+            var set = _context.Set<categorium>();
+            var e = ToEntity(categoria);
+            await set.AddAsync(e);
             await _context.SaveChangesAsync();
+
+            // Si necesitas reflejar el Id generado en la entidad de dominio:
+            // typeof(Categoria).GetProperty(nameof(Categoria.Id))!.SetValue(categoria, e.id_categoria);
         }
 
-        public async Task UpdateAsync(Categorium categorium)
+        public async Task UpdateAsync(Categoria categoria)
         {
-            var e = ToEntity(categorium);
-            _context.categorias.Attach(e);
-            _context.Entry(e).State = EntityState.Modified;
+            var set = _context.Set<categorium>();
+            var e = ToEntity(categoria);
+
+            set.Attach(e);
+            _context.Entry(e).Property(x => x.nombre).IsModified = true;
+            _context.Entry(e).Property(x => x.descripcion).IsModified = true;
+
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id)
         {
-            var e = await _context.categorias.FirstOrDefaultAsync(x => x.id == id);
+            var set = _context.Set<categorium>();
+            var e = await set.FirstOrDefaultAsync(x => x.id_categoria == id);
             if (e is null) return;
-            _context.categorias.Remove(e);
+
+            set.Remove(e);
             await _context.SaveChangesAsync();
         }
     }

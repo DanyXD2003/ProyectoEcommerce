@@ -15,6 +15,15 @@ public class Carrito
     {
         UsuarioId = usuarioId;
         FechaCreacion = DateTime.UtcNow;
+        
+    }
+
+    public Carrito(int id, int usuarioId, DateTime fechaCreacion, List<CarritoDetalle>? detalles = null)
+    {
+        Id = id;
+        UsuarioId = usuarioId;
+        FechaCreacion = fechaCreacion;
+        if (detalles is not null) Detalles = detalles;
     }
 
     // Método de dominio: agregar un producto
@@ -24,7 +33,6 @@ public class Carrito
             throw new ArgumentException("La cantidad debe ser mayor que 0.");
 
         var detalleExistente = Detalles.FirstOrDefault(d => d.ProductoId == productoId);
-
         if (detalleExistente is null)
         {
             var nuevoDetalle = new CarritoDetalle(UsuarioId, productoId, cantidad, precioUnitario);
@@ -40,11 +48,9 @@ public class Carrito
     public void EliminarProducto(int productoId)
     {
         var detalle = Detalles.FirstOrDefault(d => d.ProductoId == productoId);
-        if (detalle != null)
-            Detalles.Remove(detalle);
+        if (detalle != null)Detalles.Remove(detalle);
     }
 
     // Método de dominio: calcular total del carrito
-    public decimal CalcularTotal() =>
-        Detalles.Sum(d => d.CalcularSubtotal());
+    public decimal CalcularTotal() =>Detalles.Sum(d => d.CalcularSubtotal());
 }
