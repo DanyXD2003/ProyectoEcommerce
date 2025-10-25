@@ -3,9 +3,9 @@ namespace Ecommerce.Domain.Repositories
 {
     public interface IDireccionRepository
     {
-        Task<IReadOnlyList<Direccion>> ListByUsuarioAsync(Guid usuarioId);
+        Task<IReadOnlyList<Direccion>> ListByUsuarioAsync(int usuarioId);
         Task AddAsync(Direccion direccion);
         Task UpdateAsync(Direccion direccion);
-        Task DeleteAsync(Guid id);
+        Task DeleteAsync(int id);
     }
 }

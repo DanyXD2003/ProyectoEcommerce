@@ -1,6 +1,7 @@
 using Ecommerce.Domain.Entities;
 using Ecommerce.Domain.Repositories;
 using Ecommerce.Infrastructure.Data;
+using Ecommerce.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.Infrastructure.Repositories
@@ -10,29 +11,32 @@ namespace Ecommerce.Infrastructure.Repositories
         private readonly EcommerceDbContext _context;
         public PagoRepository(EcommerceDbContext context) => _context = context;
 
-        private static Pago ToDomain(Infrastructure.Entities.pago e) =>
-            new Pago(e.id, e.pedido_id, e.monto, e.fecha, e.estado, e.metodo_pago_id, e.transaccion_ref);
+     private static Pago ToDomain(Infrastructure.Entities.pago e) =>
+            new Pago(
+                e.id_pedido,
+                e.monto,
+                e.metodo ?? string.Empty,
+                e.estado_pago ?? "Pendiente"
+            );
 
         private static Infrastructure.Entities.pago ToEntity(Pago d) => new()
         {
-            id = d.Id,
-            pedido_id = d.PedidoId,
+            id_pedido = d.PedidoId,
             monto = d.Monto,
-            fecha = d.Fecha,
-            estado = d.Estado,
-            metodo_pago_id = d.MetodoPagoId,
-            transaccion_ref = d.TransaccionRef
+            fecha_pago = d.FechaPago,
+            estado_pago = d.Estado,
+            metodo = d.Metodo,
         };
 
         public async Task<Pago?> GetByIdAsync(int id)
         {
-            var e = await _context.pagos.AsNoTracking().FirstOrDefaultAsync(x => x.id == id);
+            var e = await _context.pagos.AsNoTracking().FirstOrDefaultAsync(x => x.id_pago == id);
             return e is null ? null : ToDomain(e);
         }
 
         public async Task<Pago?> GetByPedidoAsync(int pedidoId)
         {
-            var e = await _context.pagos.AsNoTracking().FirstOrDefaultAsync(x => x.pedido_id == pedidoId);
+            var e = await _context.pagos.AsNoTracking().FirstOrDefaultAsync(x => x.id_pedido == pedidoId);
             return e is null ? null : ToDomain(e);
         }
 
@@ -52,7 +56,7 @@ namespace Ecommerce.Infrastructure.Repositories
 
         public async Task DeleteAsync(int id)
         {
-            var e = await _context.pagos.FirstOrDefaultAsync(x => x.id == id);
+            var e = await _context.pagos.FirstOrDefaultAsync(x => x.id_pago == id);
             if (e is null) return;
             _context.pagos.Remove(e);
             await _context.SaveChangesAsync();

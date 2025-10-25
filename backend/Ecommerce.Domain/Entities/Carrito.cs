@@ -6,18 +6,18 @@ public class Carrito
     public int UsuarioId { get; private set; }
     public DateTime FechaCreacion { get; private set; }
 
-    // Relaciones
+    // Relaciones (si las usas en Dominio)
     public Usuario? Usuario { get; private set; }
     public List<CarritoDetalle> Detalles { get; private set; } = new();
 
-    // Constructor
+    // Crea un carrito nuevo (sin Id todavía)
     public Carrito(int usuarioId)
     {
         UsuarioId = usuarioId;
         FechaCreacion = DateTime.UtcNow;
-        
     }
 
+    // ✅ Rehidratación desde persistencia
     public Carrito(int id, int usuarioId, DateTime fechaCreacion, List<CarritoDetalle>? detalles = null)
     {
         Id = id;
@@ -32,25 +32,25 @@ public class Carrito
         if (cantidad <= 0)
             throw new ArgumentException("La cantidad debe ser mayor que 0.");
 
-        var detalleExistente = Detalles.FirstOrDefault(d => d.ProductoId == productoId);
-        if (detalleExistente is null)
+        var existente = Detalles.FirstOrDefault(d => d.ProductoId == productoId);
+
+        if (existente is null)
         {
-            var nuevoDetalle = new CarritoDetalle(UsuarioId, productoId, cantidad, precioUnitario);
-            Detalles.Add(nuevoDetalle);
+            // ⚠️ Asegúrate que esta firma coincide con tu CarritoDetalle
+            var nuevo = new CarritoDetalle(Id, productoId, cantidad, precioUnitario);
+            Detalles.Add(nuevo);
         }
         else
         {
-            detalleExistente.ActualizarCantidad(detalleExistente.Cantidad + cantidad);
+            existente.ActualizarCantidad(existente.Cantidad + cantidad);
         }
     }
 
-    // Método de dominio: eliminar producto
     public void EliminarProducto(int productoId)
     {
-        var detalle = Detalles.FirstOrDefault(d => d.ProductoId == productoId);
-        if (detalle != null)Detalles.Remove(detalle);
+        var d = Detalles.FirstOrDefault(x => x.ProductoId == productoId);
+        if (d != null) Detalles.Remove(d);
     }
 
-    // Método de dominio: calcular total del carrito
-    public decimal CalcularTotal() =>Detalles.Sum(d => d.CalcularSubtotal());
+    public decimal CalcularTotal() => Detalles.Sum(d => d.CalcularSubtotal());
 }

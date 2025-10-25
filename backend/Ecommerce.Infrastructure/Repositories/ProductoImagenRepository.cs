@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Ecommerce.Domain.Entities;
 using Ecommerce.Domain.Repositories;
 using Ecommerce.Infrastructure.Data;
@@ -10,22 +13,29 @@ namespace Ecommerce.Infrastructure.Repositories
         private readonly EcommerceDbContext _context;
         public ProductoImagenRepository(EcommerceDbContext context) => _context = context;
 
-        private static ProductoImagen ToDomain(Infrastructure.Entities.producto_imagen e) =>
-            new ProductoImagen(e.id, e.id_producto, e.url_imagen, e.fecha_subida);
+       private static ProductoImagen ToDomain(Ecommerce.Infrastructure.Entities.producto_imagen e) =>
+            // Ajusta al constructor REAL de tu entidad de dominio.
+            // Si tu dominio es: new ProductoImagen(int productoId, string url)
+            new ProductoImagen(e.id_producto, e.url_imagen);
 
         private static Infrastructure.Entities.producto_imagen ToEntity(ProductoImagen d) => new()
         {
-            id = d.Id,
-            id_producto = d.IdProducto,
-            url_imagen = d.UrlImagen,
-            fecha_subida = d.FechaSubida
+            id_producto = d.ProductoId,
+            url_imagen = d.Url  
         };
 
-        public async Task<ProductoImagen?> GetByIdAsync(int id)
+    public async Task<IReadOnlyList<ProductoImagen>> ListByProductoAsync(int productoId)
         {
-            var e = await _context.producto_imagens.AsNoTracking().FirstOrDefaultAsync(x => x.id == id);
-            return e is null ? null : ToDomain(e);
+            var filas = await _context.producto_imagens
+                                      .AsNoTracking()
+                                      .Where(x => x.id_producto == productoId)
+                                      .OrderBy(x => x.id_imagen)
+                                      .ToListAsync();
+
+            // List<T> implementa IReadOnlyList<T>
+            return filas.Select(ToDomain).ToList();
         }
+
 
         public async Task AddAsync(ProductoImagen productoImagen)
         {
@@ -43,7 +53,7 @@ namespace Ecommerce.Infrastructure.Repositories
 
         public async Task DeleteAsync(int id)
         {
-            var e = await _context.producto_imagens.FirstOrDefaultAsync(x => x.id == id);
+            var e = await _context.producto_imagens.FirstOrDefaultAsync(x => x.id_imagen == id);
             if (e is null) return;
             _context.producto_imagens.Remove(e);
             await _context.SaveChangesAsync();

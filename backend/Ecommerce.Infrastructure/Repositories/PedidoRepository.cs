@@ -11,28 +11,28 @@ namespace Ecommerce.Infrastructure.Repositories
         public PedidoRepository(EcommerceDbContext context) => _context = context;
 
         private static Pedido ToDomain(Infrastructure.Entities.pedido e) =>
-            new Pedido(e.id, e.usuario_id, e.fecha, e.estado, e.total);
+            new Pedido(e.id_usuario, e.id_direccion, e.id_metodo_pago);
 
         private static Infrastructure.Entities.pedido ToEntity(Pedido d) => new()
         {
-            id = d.Id,
-            usuario_id = d.UsuarioId,
-            fecha = d.Fecha,
-            estado = d.Estado,
+            id_usuario = d.UsuarioId,
+            id_direccion = d.DireccionId,
+            id_metodo_pago = d.MetodoPagoId,
+            fecha_pedido = d.FechaPedido,  
             total = d.Total
         };
 
         public async Task<Pedido?> GetByIdAsync(int id)
         {
-            var e = await _context.pedidos.AsNoTracking().FirstOrDefaultAsync(x => x.id == id);
+            var e = await _context.pedidos.AsNoTracking().FirstOrDefaultAsync(x => x.id_pedido == id);
             return e is null ? null : ToDomain(e);
         }
 
         public async Task<IReadOnlyList<Pedido>> ListByUsuarioAsync(int usuarioId)
         {
             var list = await _context.pedidos.AsNoTracking()
-                .Where(x => x.usuario_id == usuarioId)
-                .OrderByDescending(x => x.fecha)
+                .Where(x => x.id_usuario == usuarioId)
+                .OrderByDescending(x => x.fecha_pedido)
                 .ToListAsync();
 
             return list.Select(ToDomain).ToList();
@@ -54,7 +54,7 @@ namespace Ecommerce.Infrastructure.Repositories
 
         public async Task DeleteAsync(int id)
         {
-            var e = await _context.pedidos.FirstOrDefaultAsync(x => x.id == id);
+            var e = await _context.pedidos.FirstOrDefaultAsync(x => x.id_usuario == id);
             if (e is null) return;
             _context.pedidos.Remove(e);
             await _context.SaveChangesAsync();

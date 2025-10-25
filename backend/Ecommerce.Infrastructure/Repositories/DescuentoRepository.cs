@@ -11,15 +11,18 @@ namespace Ecommerce.Infrastructure.Repositories
         public DescuentoRepository(EcommerceDbContext context) => _context = context;
 
         private static Descuento ToDomain(Infrastructure.Entities.descuento e) =>
-            new Descuento(e.id, e.codigo, e.porcentaje, e.inicio, e.fin, e.activo);
+            new Descuento(e.codigo, e.porcentaje ?? 0, e.fecha_inicio ?? DateTime.MinValue, e.fecha_fin ?? DateTime.MinValue, e.descripcion, e.activo ?? false)
+            {
+                // Asignar el Id privado mediante reflexión o un constructor adicional si es necesario
+            };
 
         private static Infrastructure.Entities.descuento ToEntity(Descuento d) => new()
         {
-            id = d.Id,
+            id_descuento = d.Id,
             codigo = d.Codigo,
             porcentaje = d.Porcentaje,
-            inicio = d.Inicio,
-            fin = d.Fin,
+            fecha_inicio = d.FechaInicio,
+            fecha_fin = d.FechaFin,
             activo = d.Activo
         };
 
@@ -48,7 +51,7 @@ namespace Ecommerce.Infrastructure.Repositories
 
         public async Task DeleteAsync(int id)
         {
-            var e = await _context.descuentos.FirstOrDefaultAsync(x => x.id == id);
+            var e = await _context.descuentos.FirstOrDefaultAsync(x => x.id_descuento == id);
             if (e is null) return;
             _context.descuentos.Remove(e);
             await _context.SaveChangesAsync();

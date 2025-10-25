@@ -6,6 +6,6 @@ namespace Ecommerce.Domain.Repositories
         Task<Descuento?> GetByCodigoAsync(string codigo);
         Task AddAsync(Descuento descuento);
         Task UpdateAsync(Descuento descuento);
-        Task DeleteAsync(Guid id);
+        Task DeleteAsync(int id);
     }
 }

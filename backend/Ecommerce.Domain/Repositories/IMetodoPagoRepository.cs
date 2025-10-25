@@ -6,6 +6,6 @@ namespace Ecommerce.Domain.Repositories
         Task<IReadOnlyList<MetodoPago>> ListActivosAsync();
         Task AddAsync(MetodoPago metodo);
         Task UpdateAsync(MetodoPago metodo);
-        Task DeleteAsync(Guid id);
+        Task DeleteAsync(int id);
     }
 }

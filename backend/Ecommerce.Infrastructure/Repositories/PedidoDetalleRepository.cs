@@ -11,13 +11,13 @@ namespace Ecommerce.Infrastructure.Repositories
         public PedidoDetalleRepository(EcommerceDbContext context) => _context = context;
 
         private static PedidoDetalle ToDomain(Infrastructure.Entities.pedido_detalle e) =>
-            new PedidoDetalle(e.id, e.pedido_id, e.producto_id, e.cantidad, e.precio_unitario);
+            new PedidoDetalle( e.id_producto, e.cantidad, e.precio_unitario);
 
         private static Infrastructure.Entities.pedido_detalle ToEntity(PedidoDetalle d) => new()
         {
-            id = d.Id,
-            pedido_id = d.PedidoId,
-            producto_id = d.ProductoId,
+            id_detalle = d.Id,
+            id_pedido = d.PedidoId,
+            id_producto = d.ProductoId,
             cantidad = d.Cantidad,
             precio_unitario = d.PrecioUnitario
         };
@@ -26,7 +26,7 @@ namespace Ecommerce.Infrastructure.Repositories
         {
             var list = await _context.pedido_detalles
                 .AsNoTracking()
-                .Where(x => x.pedido_id == pedidoId)
+                .Where(x => x.id_pedido == pedidoId)
                 .ToListAsync();
 
             return list.Select(ToDomain).ToList();
@@ -48,7 +48,7 @@ namespace Ecommerce.Infrastructure.Repositories
 
         public async Task DeleteAsync(int id)
         {
-            var e = await _context.pedido_detalles.FirstOrDefaultAsync(x => x.id == id);
+            var e = await _context.pedido_detalles.FirstOrDefaultAsync(x => x.id_detalle == id);
             if (e is null) return;
             _context.pedido_detalles.Remove(e);
             await _context.SaveChangesAsync();

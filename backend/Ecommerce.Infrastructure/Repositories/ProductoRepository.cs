@@ -11,21 +11,28 @@ namespace Ecommerce.Infrastructure.Repositories
         public ProductoRepository(EcommerceDbContext context) => _context = context;
 
         private static Producto ToDomain(Infrastructure.Entities.producto e) =>
-            new Producto(e.id, e.nombre, e.descripcion, e.precio, e.stock, e.fecha_creacion);
+            new Producto(
+                e.id_categoria,
+                e.nombre,
+                e.precio,
+                e.stock ?? 0,
+                e.activo ?? false,
+                e.descripcion
+            );
+
 
         private static Infrastructure.Entities.producto ToEntity(Producto d) => new()
         {
-            id = d.Id,
+            id_categoria = d.CategoriaId,
             nombre = d.Nombre,
-            descripcion = d.Descripcion,
             precio = d.Precio,
             stock = d.Stock,
-            fecha_creacion = d.FechaCreacion
+            descripcion = d.Descripcion,
         };
 
         public async Task<Producto?> GetByIdAsync(int id)
         {
-            var e = await _context.productos.AsNoTracking().FirstOrDefaultAsync(x => x.id == id);
+            var e = await _context.productos.AsNoTracking().FirstOrDefaultAsync(x => x.id_producto == id);
             return e is null ? null : ToDomain(e);
         }
 
@@ -45,7 +52,7 @@ namespace Ecommerce.Infrastructure.Repositories
 
         public async Task DeleteAsync(int id)
         {
-            var e = await _context.productos.FirstOrDefaultAsync(x => x.id == id);
+            var e = await _context.productos.FirstOrDefaultAsync(x => x.id_producto == id);
             if (e is null) return;
             _context.productos.Remove(e);
             await _context.SaveChangesAsync();

@@ -11,25 +11,24 @@ namespace Ecommerce.Infrastructure.Repositories
         public DireccionRepository(EcommerceDbContext context) => _context = context;
 
         private static Direccion ToDomain(Infrastructure.Entities.direccion e) =>
-            new Direccion(e.id, e.usuario_id, e.linea1, e.linea2, e.ciudad, e.estado, e.cp, e.pais);
+            new Direccion(e.id_direccion, e.calle, e.ciudad, e.departamento, e.codigo_postal, e.pais);
 
         private static Infrastructure.Entities.direccion ToEntity(Direccion d) => new()
         {
-            id = d.Id,
-            usuario_id = d.UsuarioId,
-            linea1 = d.Linea1,
-            linea2 = d.Linea2,
+            id_direccion = d.Id,
+            id_usuario = d.UsuarioId,
+            calle = d.Calle,
             ciudad = d.Ciudad,
-            estado = d.Estado,
-            cp = d.CP,
+            departamento = d.Departamento,
+            codigo_postal = d.CodigoPostal,
             pais = d.Pais
         };
 
         public async Task<IReadOnlyList<Direccion>> ListByUsuarioAsync(int usuarioId)
         {
-            var list = await _context.direcciones
+            var list = await _context.direccions
                 .AsNoTracking()
-                .Where(x => x.usuario_id == usuarioId)
+                .Where(x => x.id_usuario == usuarioId)
                 .ToListAsync();
 
             return list.Select(ToDomain).ToList();
@@ -37,23 +36,23 @@ namespace Ecommerce.Infrastructure.Repositories
 
         public async Task AddAsync(Direccion d)
         {
-            _context.direcciones.Add(ToEntity(d));
+            _context.direccions.Add(ToEntity(d));
             await _context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(Direccion d)
         {
             var e = ToEntity(d);
-            _context.direcciones.Attach(e);
+            _context.direccions.Attach(e);
             _context.Entry(e).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id)
         {
-            var e = await _context.direcciones.FirstOrDefaultAsync(x => x.id == id);
+            var e = await _context.direccions.FirstOrDefaultAsync(x => x.id_direccion == id);
             if (e is null) return;
-            _context.direcciones.Remove(e);
+            _context.direccions.Remove(e);
             await _context.SaveChangesAsync();
         }
     }

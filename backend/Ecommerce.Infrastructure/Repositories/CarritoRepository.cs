@@ -1,7 +1,9 @@
 using Ecommerce.Domain.Entities;
 using Ecommerce.Domain.Repositories;
 using Ecommerce.Infrastructure.Data;
+using Ecommerce.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace Ecommerce.Infrastructure.Repositories
 {
@@ -10,48 +12,86 @@ namespace Ecommerce.Infrastructure.Repositories
         private readonly EcommerceDbContext _context;
         public CarritoRepository(EcommerceDbContext context) => _context = context;
 
-        private static Carrito ToDomain(Infrastructure.Entities.carrito e) =>
-            new Carrito(e.id_carrito, e.id_usuario, e.activo);
-
-        private static Infrastructure.Entities.carrito ToEntity(Carrito d) => new()
+        // ---------- Mapeos ----------
+        // Infra -> Dominio
+        private static Carrito ToDomain(carrito e, bool includeDetalles = false)
         {
-            id = d.Id,
-            usuario_id = d.UsuarioId,
-            activo = d.Activo
+            if (!includeDetalles)
+                return new Carrito(e.id_carrito, e.id_usuario, e.fecha_creacion ?? DateTime.UtcNow);
+
+            var detalles = new List<CarritoDetalle>();
+            foreach (var d in e.carrito_detalles)
+            {
+                // ⚠️ Ajusta esta línea si tu CarritoDetalle tiene otra firma
+                detalles.Add(new CarritoDetalle(d.id_carrito, d.id_producto, d.cantidad, d.precio_unitario)
+                {
+                    // Si tienes un constructor con Id, úsalo
+                    // Id = d.id_carrito_detalle
+                });
+            }
+
+            return new Carrito(e.id_carrito, e.id_usuario, e.fecha_creacion ?? DateTime.UtcNow, detalles);
+        }
+
+        // Dominio -> Infra
+        private static carrito ToEntity(Carrito d) => new carrito
+        {
+            id_carrito    = d.Id,         // 0 si es nuevo → identity en DB
+            id_usuario    = d.UsuarioId,
+            fecha_creacion = d.FechaCreacion // tu BD tiene default now(), pero enviarlo no molesta
         };
 
+        // ---------- CRUD ----------
         public async Task<Carrito?> GetByIdAsync(int id)
         {
-            var e = await _context.carritos.AsNoTracking().FirstOrDefaultAsync(x => x.id == id);
-            return e is null ? null : ToDomain(e);
+            var e = await _context.Set<carrito>()
+                                  .Include(x => x.carrito_detalles)
+                                  .AsNoTracking()
+                                  .FirstOrDefaultAsync(x => x.id_carrito == id);
+
+            return e is null ? null : ToDomain(e, includeDetalles: true);
         }
 
         public async Task<Carrito?> GetActivoByUsuarioAsync(int usuarioId)
         {
-            var e = await _context.carritos.AsNoTracking()
-                .FirstOrDefaultAsync(x => x.usuario_id == usuarioId && x.activo);
-            return e is null ? null : ToDomain(e);
+            // Por tu índice único en id_usuario, debe existir 0-1 carrito por usuario
+            var e = await _context.Set<carrito>()
+                                  .Include(x => x.carrito_detalles)
+                                  .AsNoTracking()
+                                  .FirstOrDefaultAsync(x => x.id_usuario == usuarioId);
+
+            return e is null ? null : ToDomain(e, includeDetalles: true);
         }
 
         public async Task AddAsync(Carrito c)
         {
-            _context.carritos.Add(ToEntity(c));
+            var e = ToEntity(c);
+            await _context.Set<carrito>().AddAsync(e);
             await _context.SaveChangesAsync();
+
+            // (Opcional) reflejar Id generado en dominio:
+            // typeof(Carrito).GetProperty(nameof(Carrito.Id))!.SetValue(c, e.id_carrito);
         }
 
         public async Task UpdateAsync(Carrito c)
         {
             var e = ToEntity(c);
-            _context.carritos.Attach(e);
-            _context.Entry(e).State = EntityState.Modified;
+            _context.Set<carrito>().Attach(e);
+
+            // Normalmente no cambias fecha_creacion; marca lo necesario
+            _context.Entry(e).Property(x => x.id_usuario).IsModified = true;
+            // _context.Entry(e).Property(x => x.fecha_creacion).IsModified = false;
+
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id)
         {
-            var e = await _context.carritos.FirstOrDefaultAsync(x => x.id == id);
+            var set = _context.Set<carrito>();
+            var e = await set.FirstOrDefaultAsync(x => x.id_carrito == id);
             if (e is null) return;
-            _context.carritos.Remove(e);
+
+            set.Remove(e);
             await _context.SaveChangesAsync();
         }
     }

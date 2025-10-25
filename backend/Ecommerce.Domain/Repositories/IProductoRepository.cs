@@ -3,9 +3,9 @@ namespace Ecommerce.Domain.Repositories
 {
     public interface IProductoRepository
     {
-        Task<Producto?> GetByIdAsync(Guid id);
+        Task<Producto?> GetByIdAsync(int id);
         Task AddAsync(Producto producto);
         Task UpdateAsync(Producto producto);
-        Task DeleteAsync(Guid id);
+        Task DeleteAsync(int id);
     }
 }

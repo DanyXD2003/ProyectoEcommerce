@@ -3,10 +3,10 @@ namespace Ecommerce.Domain.Repositories
 {
     public interface IPagoRepository
     {
-        Task<Pago?> GetByIdAsync(Guid id);
-        Task<Pago?> GetByPedidoAsync(Guid pedidoId);
+        Task<Pago?> GetByIdAsync(int id);
+        Task<Pago?> GetByPedidoAsync(int pedidoId);
         Task AddAsync(Pago pago);
         Task UpdateAsync(Pago pago);
-        Task DeleteAsync(Guid id);
+        Task DeleteAsync(int id);
     }
 }
