@@ -17,7 +17,7 @@ public class Carrito
         FechaCreacion = DateTime.UtcNow;
     }
 
-    // ✅ Rehidratación desde persistencia
+    // Rehidratación desde persistencia
     public Carrito(int id, int usuarioId, DateTime fechaCreacion, List<CarritoDetalle>? detalles = null)
     {
         Id = id;
@@ -36,7 +36,7 @@ public class Carrito
 
         if (existente is null)
         {
-            // ⚠️ Asegúrate que esta firma coincide con tu CarritoDetalle
+            //  Asegúrate que esta firma coincide con tu CarritoDetalle
             var nuevo = new CarritoDetalle(Id, productoId, cantidad, precioUnitario);
             Detalles.Add(nuevo);
         }

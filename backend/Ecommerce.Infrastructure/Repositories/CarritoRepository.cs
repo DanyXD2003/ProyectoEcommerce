@@ -22,12 +22,9 @@ namespace Ecommerce.Infrastructure.Repositories
             var detalles = new List<CarritoDetalle>();
             foreach (var d in e.carrito_detalles)
             {
-                // ⚠️ Ajusta esta línea si tu CarritoDetalle tiene otra firma
+                //  Ajusta esta línea si tu CarritoDetalle tiene otra firma
                 detalles.Add(new CarritoDetalle(d.id_carrito, d.id_producto, d.cantidad, d.precio_unitario)
-                {
-                    // Si tienes un constructor con Id, úsalo
-                    // Id = d.id_carrito_detalle
-                });
+                );
             }
 
             return new Carrito(e.id_carrito, e.id_usuario, e.fecha_creacion ?? DateTime.UtcNow, detalles);
