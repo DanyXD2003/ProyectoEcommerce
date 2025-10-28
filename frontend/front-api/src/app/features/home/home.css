@@ -1,0 +1,69 @@
+:root {
+  --celeste: #87CEEB;
+  --dark-blue: #0047AB;
+  --background-light: #f6f7f8;
+  --background-dark: #101c22;
+  --text-neutral: #333333;
+}
+
+/* Reutilizables */
+.bg-background-light { background-color: var(--background-light) !important; }
+.text-dark-blue { color: var(--dark-blue) !important; }
+.text-celeste { color: var(--celeste) !important; }
+.text-text-neutral { color: var(--text-neutral) !important; }
+
+.btn-celeste {
+  background-color: var(--celeste);
+  color: #fff;
+  border: none;
+  transition: all 0.3s ease;
+}
+.btn-celeste:hover { background-color: #6dc4e8; }
+
+.btn-outline-celeste {
+  border: 2px solid var(--celeste);
+  color: var(--celeste);
+  background: transparent;
+  transition: all 0.3s ease;
+}
+.btn-outline-celeste:hover {
+  background-color: rgba(135,206,235,0.15);
+}
+
+/* Imagenes hero y producto */
+.hero-img {
+  background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBqN7aaqRJqAmsuJ7oQyIhK9JnE-N6OTmzSpQCSCiLvAHb8dXcPuhsqAlKqRTjtkU4x_C9dwx-znu5DiDU5O_6ZOVN6R__rpY3cN_u3dEf8XDuSPm1WkW04TXIgSsfezyV4jmxQFShUDLOJa1Q3ptn3zzu0iItMg7p0pYor3dKPRrauledo3TsYFyO7pJnyhYPGFcMohoGw0QEctplTlpzLvuEwxpUkXTGQZG8O2KI2gPu0hCcRK6PIbv25GJBJrdHlehMXES5M_Mc');
+  background-size: cover;
+  background-position: center;
+  aspect-ratio: 16/9;
+}
+
+.product-img {
+  background-size: cover;
+  background-position: center;
+  height: 200px;
+}
+
+/* NAVBAR FIJA Y CON FONDO BLANCO */
+header.navbar {
+  background-color: #ffffff !important; 
+  position: sticky;
+  top: 0;
+  z-index: 1030; /* Se asegura de estar sobre el contenido */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); /* Sombra sutil */
+}
+
+/* Ajustes para enlaces dentro de la barra */
+.navbar .nav-link {
+  color: #0d1b2a !important; /* Azul oscuro elegante */
+  transition: color 0.2s ease-in-out;
+}
+
+.navbar .nav-link:hover {
+  color: #1773cf !important; /* Azul principal al pasar el cursor */
+}
+
+/* Ícono y texto del logo */
+.text-dark-blue {
+  color: #0d1b2a !important;
+}

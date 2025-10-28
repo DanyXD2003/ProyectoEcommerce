@@ -1,0 +1,34 @@
+
+
+body {
+  font-family: 'Manrope', sans-serif;
+  background-color: #f6f7f8;
+  color: #333333;
+}
+
+/* Botón celeste */
+.btn-celeste {
+  background-color: #87CEEB;
+  border-color: #87CEEB;
+
+  &:hover {
+    background-color: lighten(#87CEEB, 5%);
+  }
+}
+
+/* Textos */
+.text-dark-blue {
+  color: #0047AB !important;
+}
+
+.text-celeste {
+  color: #87CEEB !important;
+}
+
+/* Card */
+.card {
+  transition: box-shadow 0.3s;
+  &:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 71, 171, 0.3);
+  }
+}

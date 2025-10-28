@@ -34,7 +34,7 @@ export class Login {
         if (response.token) {
           localStorage.setItem('access_token', response.token);
           console.log('Login exitoso con token:', response.token);
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/']);
         } else {
           // Si no hay token, imprime toda la data que vino del backend
           console.log('Datos del usuario:', response);
