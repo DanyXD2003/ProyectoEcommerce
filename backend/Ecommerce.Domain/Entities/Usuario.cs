@@ -38,6 +38,19 @@ namespace Ecommerce.Domain.Entities
             FechaRegistro = DateTime.UtcNow;
         }
 
+        // Constructor usado para rehidratar desde la capa de persistencia
+        public Usuario(int id, string nombre, string? apellido, string correo, string contrasenaHash, string? telefono, string? rol, DateTime? fechaRegistro)
+        {
+            Id = id;
+            Nombre = nombre;
+            Apellido = apellido;
+            Correo = correo ?? throw new ArgumentException("El correo no puede estar vacío.", nameof(correo));
+            ContrasenaHash = contrasenaHash ?? throw new ArgumentException("La contraseña no puede estar vacía.", nameof(contrasenaHash));
+            Telefono = telefono;
+            Rol = rol ?? string.Empty;
+            FechaRegistro = fechaRegistro ?? DateTime.UtcNow;
+        }
+
         /*
         // Métodos del dominio (reglas de negocio)
         public void CambiarContraseña(string nuevoHash)

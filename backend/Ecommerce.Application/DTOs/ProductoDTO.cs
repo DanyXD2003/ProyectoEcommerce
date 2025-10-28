@@ -1,0 +1,1 @@
+namespace Ecommerce.Application.DTOs{} public class InfoProductoDTO { public string Nombre { get; private set; } = String.Empty; public string Descripcion { get; private set; } = String.Empty; public decimal Precio { get; private set; } }
