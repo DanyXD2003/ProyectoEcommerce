@@ -19,15 +19,15 @@ namespace Ecommerce.Application.Mappers
             //  Mapea UsuarioRegistroDTO -> Usuario (registro)
             CreateMap<UsuarioRegistroDTO, Usuario>()
                 .ConstructUsing(dto => new Usuario(
-                    dto.Nombre,
-                    dto.Correo,
-                    dto.Contrasena,
-                    dto.TipoCuenta
+                    dto.nombre,
+                    dto.correo,
+                    dto.contrasena,
+                    dto.tipoCuenta
                 ));
 
             // (Opcional) Si luego querés devolver info al frontend:
             CreateMap<Usuario, UsuarioRegistroDTO>()
-                .ForMember(dest => dest.Contrasena, opt => opt.Ignore());
+                .ForMember(dest => dest.contrasena, opt => opt.Ignore());
         }
     }
 }

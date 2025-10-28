@@ -43,15 +43,21 @@ namespace Ecommerce.API.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
-            var usuario = await _usuarioService.RegistrarUsuarioAsync(dto);
-            return Ok(new
+            try
             {
-                usuario.Id,
-                usuario.Nombre,
-                usuario.Correo,
-                usuario.Rol
-            });
+                var usuario = await _usuarioService.RegistrarUsuarioAsync(dto);
+                return Ok(new
+                {
+                    usuario.Id,
+                    usuario.Nombre,
+                    usuario.Correo,
+                    usuario.Rol
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { mensaje = ex.Message });
+            }
         }
     }
 }

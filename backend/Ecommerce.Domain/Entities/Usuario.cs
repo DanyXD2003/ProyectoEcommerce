@@ -11,7 +11,7 @@ namespace Ecommerce.Domain.Entities
         public string ContrasenaHash { get; private set; }
         public string? Telefono { get; private set; }
         public string Rol { get; private set; }
-        public DateTime FechaRegistro { get; private set; }
+        public DateTime FechaRegistro { get; set; }
 
         /*
         // Relaciones (pueden representarse como colecciones del dominio)

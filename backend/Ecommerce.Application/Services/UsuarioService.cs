@@ -38,13 +38,20 @@ namespace Ecommerce.Application.Services
         // Método para registrar un nuevo usuario
         public async Task<Usuario> RegistrarUsuarioAsync(UsuarioRegistroDTO dto)
         {
-            // Convertir DTO a dominio usando AutoMapper
-            var usuario = _mapper.Map<Usuario>(dto);
+            try {
+                var usuario = _mapper.Map<Usuario>(dto);
 
-            // Guardar en la base de datos
-            await _usuarioRepository.AddAsync(usuario);
+                // Forzar la fecha como "local" (sin zona horaria)
+                usuario.FechaRegistro = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified);
 
-            return usuario;
+                await _usuarioRepository.AddAsync(usuario);
+                return usuario;
+            }
+            catch (System.Exception ex)
+            {
+                Console.WriteLine($"[ERROR SQL] {ex.InnerException?.Message ?? ex.Message}");
+                throw;
+            }
         }
     }
 }
