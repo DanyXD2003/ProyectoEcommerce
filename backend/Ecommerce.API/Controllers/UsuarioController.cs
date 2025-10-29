@@ -39,7 +39,7 @@ namespace Ecommerce.API.Controllers
 
         // Endpoint POST api/usuario/registrar
         [HttpPost("registrar")]
-        public async Task<IActionResult> Registrar([FromBody] UsuarioLoginDTO dto)
+        public async Task<IActionResult> Registrar([FromBody] UsuarioRegistroDTO dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
