@@ -32,6 +32,7 @@ namespace Ecommerce.API.Controllers
             {
                 usuario.Id,
                 usuario.Nombre,
+                usuario.Apellido,
                 usuario.Correo,
                 usuario.Rol
             });
@@ -50,6 +51,7 @@ namespace Ecommerce.API.Controllers
                 {
                     usuario.Id,
                     usuario.Nombre,
+                    usuario.Apellido,
                     usuario.Correo,
                     usuario.Rol
                 });

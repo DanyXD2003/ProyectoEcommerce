@@ -1,1 +1,25 @@
-<p>recovery works!</p>
+<div class="d-flex flex-column justify-content-center min-vh-100 p-3 bg-light text-dark">
+  <div class="mx-auto w-100" style="max-width: 450px;">
+    <div class="text-center mb-4">
+      <h1 class="fw-bold">Recuperar Contraseña</h1>
+      <p class="text-muted">Ingresa tu correo electrónico para restablecer tu contraseña.</p>
+    </div>
+
+    <div class="card shadow-sm p-4">
+      <form (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+          <input type="email" class="form-control" placeholder="Correo electrónico" [(ngModel)]="email" name="email">
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 fw-bold py-2">Enviar enlace</button>
+      </form>
+    </div>
+
+    <div class="text-center mt-3">
+      <p class="text-muted mb-0">
+        ¿Recordaste tu contraseña?
+        <a routerLink="/login" class="fw-medium text-primary text-decoration-none">Inicia sesión</a>
+      </p>
+    </div>
+  </div>
+</div>

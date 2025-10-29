@@ -10,7 +10,7 @@ namespace Ecommerce.Application.Mappers
         {
             // Mapea UsuarioLoginDTO -> Usuario (login)
             CreateMap<UsuarioLoginDTO, Usuario>()
-                .ConstructUsing(dto => new Usuario(dto.Correo, dto.Correo, dto.Contrasena, "Cliente"));
+                .ConstructUsing(dto => new Usuario(dto.Correo, dto.Correo, dto.Correo, dto.Contrasena, "Cliente"));
 
             // Mapea Usuario -> UsuarioLoginDTO (sin contraseña)
             CreateMap<Usuario, UsuarioLoginDTO>()
@@ -20,6 +20,7 @@ namespace Ecommerce.Application.Mappers
             CreateMap<UsuarioRegistroDTO, Usuario>()
                 .ConstructUsing(dto => new Usuario(
                     dto.nombre,
+                    dto.apellido,
                     dto.correo,
                     dto.contrasena,
                     dto.tipoCuenta

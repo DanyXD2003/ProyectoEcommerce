@@ -20,7 +20,7 @@ namespace Ecommerce.Domain.Entities
         public ICollection<Pedido> Pedidos { get; private set; } = new List<Pedido>();
         */
         // Constructor principal
-        public Usuario(string nombre, string correo, string contrasenaHash, string rol)
+        public Usuario(string nombre, string apellido, string correo, string contrasenaHash, string rol)
         {
             //if (string.IsNullOrWhiteSpace(nombre))
             //throw new ArgumentException("El nombre no puede estar vacío.", nameof(nombre));
@@ -32,6 +32,7 @@ namespace Ecommerce.Domain.Entities
                 throw new ArgumentException("La contraseña no puede estar vacía.", nameof(contrasenaHash));
 
             Nombre = nombre;
+            Apellido = apellido;
             Correo = correo;
             ContrasenaHash = contrasenaHash;
             Rol = rol;

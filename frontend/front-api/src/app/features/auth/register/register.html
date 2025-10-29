@@ -8,7 +8,11 @@
     <div class="card shadow-sm p-4">
       <form (ngSubmit)="onSubmit()">
         <div class="mb-3">
-          <input type="text" class="form-control" placeholder="Nombre completo" [(ngModel)]="user.nombre" name="nombre">
+          <input type="text" class="form-control" placeholder="Ingrese Nombre" [(ngModel)]="user.nombre" name="nombre">
+        </div>
+
+        <div class="mb-3">
+          <input type="text" class="form-control" placeholder="Ingrese Apellido" [(ngModel)]="user.apellido" name="apellido">
         </div>
 
         <div class="mb-3">
@@ -27,13 +31,13 @@
           <label class="form-label text-muted">Tipo de cuenta</label>
           <div class="d-flex gap-4">
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="tipoCuenta" [(ngModel)]="user.tipoCuenta" value="customer">
+              <input class="form-check-input" type="radio" name="tipoCuenta" [(ngModel)]="user.tipoCuenta" value="cliente">
               <label class="form-check-label">Cliente</label>
             </div>
             <div class="form-check">
               <input class="form-check-input" type="radio" name="tipoCuenta" [(ngModel)]="user.tipoCuenta" value="admin">
               <label class="form-check-label">Administrador</label>
-            </div>
+            </div> 
           </div>
         </div>
 

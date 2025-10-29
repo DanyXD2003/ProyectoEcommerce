@@ -13,10 +13,11 @@ import { AuthService } from '../../../core/services/auth';
 export class Register {
   user = {
     nombre: '',
+    apellido: '',
     correo: '',
     contrasena: '',
     //confirmarContrasena: '',
-    tipoCuenta: 'customer'
+    tipoCuenta: 'cliente'
   };
 
   constructor(private authService: AuthService, private router: Router) {}
