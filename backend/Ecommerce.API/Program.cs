@@ -3,7 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using Ecommerce.Application.Mappers;
 using Ecommerce.Application.Services;
 using Ecommerce.Domain.Repositories;
-using Ecommerce.Infrastructure.Repositories;    
+using Ecommerce.Infrastructure.Repositories;  
+using WebFinal.Domain.Interfaces;
+using WebFinal.Infrastructure.Security;  
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,7 +41,28 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
+            )
+        };
+    });
+
+
 var app = builder.Build();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Middleware pipeline
 app.UseSwagger();

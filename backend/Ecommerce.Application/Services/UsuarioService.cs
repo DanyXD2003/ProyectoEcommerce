@@ -3,6 +3,7 @@ using Ecommerce.Application.DTOs;
 using Ecommerce.Domain.Entities;
 using Ecommerce.Domain.Repositories;
 using AutoMapper;
+using WebFinal.Domain.Interfaces;
 
 namespace Ecommerce.Application.Services
 {
@@ -10,30 +11,35 @@ namespace Ecommerce.Application.Services
     {
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IMapper _mapper;
+        private readonly IJwtTokenGenerator _jwtGenerator;
 
         // Constructor con inyección de dependencias
-        public UsuarioService(IUsuarioRepository usuarioRepository, IMapper mapper)
+        public UsuarioService(IUsuarioRepository usuarioRepository, IMapper mapper, IJwtTokenGenerator jwtGenerator)
         {
             _usuarioRepository = usuarioRepository;
             _mapper = mapper;
+            _jwtGenerator = jwtGenerator;
         }
 
         // Método para login
-        public async Task<Usuario?> LoginAsync(UsuarioLoginDTO dto)
+        public async Task<string?> LoginAsync(UsuarioLoginDTO dto)
         {
             // Buscar usuario por correo
             var usuario = await _usuarioRepository.GetByCorreoAsync(dto.Correo);
 
             if (usuario == null)
-                return null; // usuario no encontrado
+                return null;
 
-            // Validar contraseña (ejemplo simple, más adelante con hash seguro)
+            // Validar contraseña (ejemplo simple, deberías usar hash en el futuro)
             if (usuario.ContrasenaHash != dto.Contrasena)
-                return null; // contraseña incorrecta
+                return null;
 
-            // Retornar la entidad de dominio si todo es correcto
-            return usuario;
+            // Generar el token
+            var token = _jwtGenerator.GenerateToken(usuario);
+
+            return token;
         }
+
 
         // Método para registrar un nuevo usuario
         public async Task<Usuario> RegistrarUsuarioAsync(UsuarioRegistroDTO dto)

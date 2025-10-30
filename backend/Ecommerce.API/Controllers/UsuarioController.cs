@@ -23,20 +23,14 @@ namespace Ecommerce.API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var usuario = await _usuarioService.LoginAsync(dto);
+            var token = await _usuarioService.LoginAsync(dto);
 
-            if (usuario == null)
+            if (token == null)
                 return Unauthorized("Correo o contraseña incorrectos");
 
-            return Ok(new
-            {
-                usuario.Id,
-                usuario.Nombre,
-                usuario.Apellido,
-                usuario.Correo,
-                usuario.Rol
-            });
+            return Ok(new { Token = token });
         }
+
 
         // Endpoint POST api/usuario/registrar
         [HttpPost("registrar")]
