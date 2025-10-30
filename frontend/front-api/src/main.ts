@@ -8,11 +8,14 @@ import { routes } from './app/app.routes';
 import { provideHttpClient } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from './app/core/interceptors/auth.interceptor';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+
 
 bootstrapApplication(App, {
   providers: [
     provideRouter(routes),
     provideHttpClient(),  // sin argumentos extras
+    provideAnimationsAsync(),
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
   ]
 });

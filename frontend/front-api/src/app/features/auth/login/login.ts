@@ -4,12 +4,15 @@ import { AuthService } from '../../../core/services/auth';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { AlertModalComponent } from '../../../core/services/modal-alert/modal-alert'; // <-- ajusta ruta según tu estructura
 
 @Component({
   selector: 'app-login',
+  standalone: true,
   templateUrl: './login.html',
   styleUrls: ['./login.css'],
-  imports: [FormsModule, RouterLink]
+  imports: [FormsModule, RouterLink, MatDialogModule]
 })
 export class Login {
   Correo = '';
@@ -19,7 +22,8 @@ export class Login {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
+    private dialog: MatDialog
   ) {}
 
   onSubmit() {
@@ -28,25 +32,49 @@ export class Login {
 
     this.authService.login({ Correo: this.Correo, Contrasena: this.Contrasena }).subscribe({
       next: (response: any) => {
-        console.log(' Respuesta del backend:', response);
+        console.log('Respuesta del backend:', response);
 
-        // Si el backend devuelve un token (en caso de que lo agregues después)
+        // Guardar token o usuario según el backend
         if (response.token) {
           localStorage.setItem('access_token', response.token);
-          console.log('Login exitoso con token:', response.token);
-          this.router.navigate(['/']);
-        } else {
-          // Si no hay token, imprime toda la data que vino del backend
-          console.log('Datos del usuario:', response);
-          localStorage.setItem('usuario', JSON.stringify(response));
-
-          // También puedes redirigir al dashboard si el login fue exitoso
-          this.router.navigate(['/dashboard']);
         }
+        if (response.usuario) {
+          localStorage.setItem('usuario', JSON.stringify(response.usuario));
+        } else {
+          localStorage.setItem('usuario', JSON.stringify(response));
+        }
+
+
+        // Abrir modal de éxito
+        const dialogRef = this.dialog.open(AlertModalComponent, {
+          data: {
+            title: 'Inicio de sesión exitoso',
+            message: `Bienvenido, ${response.nombre || 'usuario'}`
+          },
+              width: '450px',        // ancho estándar
+              minWidth: '320px',     // para móviles
+              maxWidth: '90vw',      // no exceder 90% del viewport
+              height: '150px',        // para que la altura se ajuste
+              panelClass: 'mat-mdc-dialog-container'
+        });
+
+        // Cuando el usuario cierre el modal, redirige
+        dialogRef.afterClosed().subscribe(() => {
+          this.router.navigate(['/home']);
+        });
       },
       error: (error: any) => {
         console.error('Error en el login:', error);
         this.errorMessage = 'Ocurrió un error de red o de servidor';
+
+        // También podrías mostrar un modal de error
+        this.dialog.open(AlertModalComponent, {
+          data: {
+            title: 'Error',
+            message: 'Credenciales incorrectas o error del servidor.'
+          },
+          width: '350px'
+        });
       }
     });
   }

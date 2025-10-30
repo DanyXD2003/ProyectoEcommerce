@@ -28,8 +28,23 @@ export class AuthService {
     return this.http.post<any>(url, userData);
   }
 
-    getToken(): string | null {
+  getToken(): string | null {
       return localStorage.getItem('access_token');
     }
+  // Saber si el usuario está logueado
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('access_token');
   }
 
+  // Obtener información del usuario
+  getUser(): any {
+    const data = localStorage.getItem('usuario');
+    return data ? JSON.parse(data) : null;
+  }
+
+  // Cerrar sesión
+  logout(): void {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('usuario');
+  }
+}
