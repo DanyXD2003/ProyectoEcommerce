@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Ecommerce.Domain.Entities;
-using WebFinal.Domain.Interfaces;
+using Ecommerce.Domain.Repositories;
 
 namespace WebFinal.Infrastructure.Security
 {

@@ -2,8 +2,8 @@
 using Ecommerce.Application.DTOs;
 using Ecommerce.Domain.Entities;
 using Ecommerce.Domain.Repositories;
+
 using AutoMapper;
-using WebFinal.Domain.Interfaces;
 
 namespace Ecommerce.Application.Services
 {

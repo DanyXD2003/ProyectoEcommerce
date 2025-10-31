@@ -3,7 +3,6 @@ using System.Xml;
 using AutoMapper;
 using Ecommerce.Application.DTOs;
 using Ecommerce.Domain.Entities;
-using Ecommerce.Infrastructure.Entities;
 
 namespace commerce.Application.Mappers
 {

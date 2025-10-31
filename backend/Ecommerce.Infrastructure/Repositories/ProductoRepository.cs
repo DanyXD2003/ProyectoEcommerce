@@ -10,52 +10,43 @@ namespace Ecommerce.Infrastructure.Repositories
         private readonly EcommerceDbContext _context;
         public ProductoRepository(EcommerceDbContext context) => _context = context;
 
-        private static Producto ToDomain(Infrastructure.Entities.producto e) =>
+        private static Producto ToDomain(Producto e) =>
             new Producto(
-                e.id_categoria,
-                e.nombre,
-                e.precio,
-                e.stock ?? 0,
-                e.activo ?? false,
-                e.descripcion
+                e.CategoriaId,
+                e.Nombre,
+                e.Precio,
+                e.Stock,
+                e.Activo,
+                e.Descripcion
             );
-
-
-        private static Infrastructure.Entities.producto ToEntity(Producto d) => new()
-        {
-            id_categoria = d.CategoriaId,
-            nombre = d.Nombre,
-            precio = d.Precio,
-            stock = d.Stock,
-            descripcion = d.Descripcion,
-        };
 
         public async Task<Producto?> GetByIdAsync(int id)
         {
-            var e = await _context.productos.AsNoTracking().FirstOrDefaultAsync(x => x.id_producto == id);
+            var e = await _context.Productos.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
             return e is null ? null : ToDomain(e);
         }
 
         public async Task AddAsync(Producto producto)
         {
-            _context.productos.Add(ToEntity(producto));
+            _context.Productos.Add(producto);
             await _context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(Producto producto)
         {
-            var e = ToEntity(producto);
-            _context.productos.Attach(e);
-            _context.Entry(e).State = EntityState.Modified;
+            _context.Productos.Attach(producto);
+            _context.Entry(producto).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id)
         {
-            var e = await _context.productos.FirstOrDefaultAsync(x => x.id_producto == id);
-            if (e is null) return;
-            _context.productos.Remove(e);
-            await _context.SaveChangesAsync();
+            var producto = await _context.Productos.FindAsync(id);
+            if (producto != null)
+            {
+                _context.Productos.Remove(producto);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

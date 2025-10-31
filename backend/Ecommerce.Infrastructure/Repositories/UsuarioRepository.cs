@@ -11,62 +11,51 @@ namespace Ecommerce.Infrastructure.Repositories
         private readonly EcommerceDbContext _context;
         public UsuarioRepository(EcommerceDbContext context) => _context = context;
 
-        private static Usuario ToDomain(Infrastructure.Entities.usuario e) =>
+        private static Usuario ToDomain(Usuario e) =>
             // usar el constructor de rehidratación del dominio
             new Usuario(
-                e.id_usuario,
-                e.nombre,
-                e.apellido,
-                e.correo,
-                e.contraseña_hash,
-                e.telefono,
-                e.rol,
-                e.fecha_registro);
-
-        private static Infrastructure.Entities.usuario ToEntity(Usuario d) => new()
-        {
-            id_usuario = d.Id,
-            nombre = d.Nombre,
-            apellido = d.Apellido,
-            correo = d.Correo,
-            contraseña_hash = d.ContrasenaHash,
-            telefono = d.Telefono,
-            rol = d.Rol,
-            fecha_registro = d.FechaRegistro
-        };
+                e.Id,
+                e.Nombre,
+                e.Apellido,
+                e.Correo,
+                e.ContrasenaHash,
+                e.Telefono,
+                e.Rol,
+                e.FechaRegistro);
 
         public async Task<Usuario?> GetByIdAsync(int id)
         {
-            var e = await _context.usuarios.AsNoTracking().FirstOrDefaultAsync(x => x.id_usuario == id);
+            var e = await _context.Usuarios.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
             return e is null ? null : ToDomain(e);
         }
 
         public async Task<Usuario?> GetByCorreoAsync(string correo)
         {
-            var e = await _context.usuarios.AsNoTracking().FirstOrDefaultAsync(u => u.correo == correo);
+            var e = await _context.Usuarios.AsNoTracking().FirstOrDefaultAsync(u => u.Correo == correo);
             return e is null ? null : ToDomain(e);
         }
 
         public async Task AddAsync(Usuario usuario)
         {
-            _context.usuarios.Add(ToEntity(usuario));
+            _context.Usuarios.Add(usuario);
             await _context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(Usuario usuario)
         {
-            var e = ToEntity(usuario);
-            _context.usuarios.Attach(e);
-            _context.Entry(e).State = EntityState.Modified;
+            _context.Usuarios.Attach(usuario);
+            _context.Entry(usuario).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id)
         {
-            var e = await _context.usuarios.FirstOrDefaultAsync(x => x.id_usuario == id);
-            if (e is null) return;
-            _context.usuarios.Remove(e);
-            await _context.SaveChangesAsync();
+            var usuario = await _context.Usuarios.FindAsync(id);
+            if (usuario != null)
+            {
+                _context.Usuarios.Remove(usuario);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

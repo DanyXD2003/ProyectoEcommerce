@@ -1,7 +1,6 @@
 using Ecommerce.Domain.Entities;
 using Ecommerce.Domain.Repositories;
 using Ecommerce.Infrastructure.Data;
-using Ecommerce.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.Infrastructure.Repositories
@@ -11,55 +10,48 @@ namespace Ecommerce.Infrastructure.Repositories
         private readonly EcommerceDbContext _context;
         public PagoRepository(EcommerceDbContext context) => _context = context;
 
-     private static Pago ToDomain(Infrastructure.Entities.pago e) =>
-            new Pago(
-                e.id_pedido,
-                e.monto,
-                e.metodo ?? string.Empty,
-                e.estado_pago ?? "Pendiente"
-            );
-
-        private static Infrastructure.Entities.pago ToEntity(Pago d) => new()
-        {
-            id_pedido = d.PedidoId,
-            monto = d.Monto,
-            fecha_pago = d.FechaPago,
-            estado_pago = d.Estado,
-            metodo = d.Metodo,
-        };
+        private static Pago ToDomain(Pago e) =>
+                new Pago(
+                    e.Id,
+                    e.Monto,
+                    e.Metodo ?? string.Empty,
+                    e.Estado ?? "Pendiente"
+                );
 
         public async Task<Pago?> GetByIdAsync(int id)
         {
-            var e = await _context.pagos.AsNoTracking().FirstOrDefaultAsync(x => x.id_pago == id);
+            var e = await _context.Pagos.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
             return e is null ? null : ToDomain(e);
         }
 
         public async Task<Pago?> GetByPedidoAsync(int pedidoId)
         {
-            var e = await _context.pagos.AsNoTracking().FirstOrDefaultAsync(x => x.id_pedido == pedidoId);
+            var e = await _context.Pagos.AsNoTracking().FirstOrDefaultAsync(x => x.Id == pedidoId);
             return e is null ? null : ToDomain(e);
         }
 
         public async Task AddAsync(Pago p)
         {
-            _context.pagos.Add(ToEntity(p));
+            _context.Pagos.Add(ToDomain(p));
             await _context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(Pago p)
         {
-            var e = ToEntity(p);
-            _context.pagos.Attach(e);
+            var e = ToDomain(p);
+            _context.Pagos.Attach(e);
             _context.Entry(e).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id)
         {
-            var e = await _context.pagos.FirstOrDefaultAsync(x => x.id_pago == id);
-            if (e is null) return;
-            _context.pagos.Remove(e);
-            await _context.SaveChangesAsync();
+            var pago = await _context.Pagos.FindAsync(id);
+            if (pago != null)
+            {
+                _context.Pagos.Remove(pago);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

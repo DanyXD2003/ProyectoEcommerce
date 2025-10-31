@@ -10,51 +10,41 @@ namespace Ecommerce.Infrastructure.Repositories
         private readonly EcommerceDbContext _context;
         public DescuentoRepository(EcommerceDbContext context) => _context = context;
 
-        private static Descuento ToDomain(Infrastructure.Entities.descuento e) =>
-            new Descuento(e.codigo, e.porcentaje ?? 0, e.fecha_inicio ?? DateTime.MinValue, e.fecha_fin ?? DateTime.MinValue, e.descripcion, e.activo ?? false)
+        private static Descuento ToDomain(Descuento e) =>
+            new Descuento(e.Codigo, e.Porcentaje, e.FechaInicio, e.FechaFin, e.Descripcion, e.Activo)
             {
-                // Asignar el Id privado mediante reflexión o un constructor adicional si es necesario
+                
             };
 
-        private static Infrastructure.Entities.descuento ToEntity(Descuento d) => new()
-        {
-            id_descuento = d.Id,
-            codigo = d.Codigo,
-            porcentaje = d.Porcentaje,
-            fecha_inicio = d.FechaInicio,
-            fecha_fin = d.FechaFin,
-            activo = d.Activo
-        };
 
         public async Task<Descuento?> GetByCodigoAsync(string codigo)
         {
-            var e = await _context.descuentos
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.codigo == codigo);
-
+            var e = await _context.Descuentos.AsNoTracking().FirstOrDefaultAsync(d => d.Codigo == codigo);
             return e is null ? null : ToDomain(e);
         }
 
         public async Task AddAsync(Descuento d)
         {
-            _context.descuentos.Add(ToEntity(d));
+            _context.Descuentos.Add(ToDomain(d));
             await _context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(Descuento d)
         {
-            var e = ToEntity(d);
-            _context.descuentos.Attach(e);
+            var e = ToDomain(d);
+            _context.Descuentos.Attach(e);
             _context.Entry(e).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id)
         {
-            var e = await _context.descuentos.FirstOrDefaultAsync(x => x.id_descuento == id);
-            if (e is null) return;
-            _context.descuentos.Remove(e);
-            await _context.SaveChangesAsync();
+            var descuento = await _context.Descuentos.FindAsync(id);
+            if (descuento != null)
+            {
+                _context.Descuentos.Remove(descuento);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

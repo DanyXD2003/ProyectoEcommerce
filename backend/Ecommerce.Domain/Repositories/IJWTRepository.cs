@@ -1,9 +1,8 @@
 using Ecommerce.Domain.Entities;
 
-namespace WebFinal.Domain.Interfaces
-{
+namespace Ecommerce.Domain.Repositories;
     public interface IJwtTokenGenerator
     {
         string GenerateToken(Usuario usuario);
     }
-}
+

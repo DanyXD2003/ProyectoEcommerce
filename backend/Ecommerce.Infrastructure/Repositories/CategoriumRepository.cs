@@ -1,7 +1,6 @@
 using Ecommerce.Domain.Entities;
 using Ecommerce.Domain.Repositories;
 using Ecommerce.Infrastructure.Data;
-using Ecommerce.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.Infrastructure.Repositories
@@ -12,54 +11,41 @@ namespace Ecommerce.Infrastructure.Repositories
         public CategoriaRepository(EcommerceDbContext context) => _context = context;
 
         // Infra -> Dominio
-        private static Categoria ToDomain(categorium e)
-            => new Categoria(e.id_categoria, e.nombre, e.descripcion);
-
-        // Dominio -> Infra
-        private static categorium ToEntity(Categoria d)
-            => new categorium
-            {
-                id_categoria = d.Id, // 0 si es nueva
-                nombre = d.Nombre,
-                descripcion = d.Descripcion
-            };
+        private static Categoria ToDomain(Categoria e)
+            => new Categoria(e.Id, e.Nombre, e.Descripcion);
 
         public async Task<Categoria?> GetByIdAsync(int id)
         {
-            var set = _context.Set<categorium>();
-            var e = await set.AsNoTracking()
-                             .FirstOrDefaultAsync(x => x.id_categoria == id);
-            return e is null ? null : ToDomain(e);
+            var set = _context.Set<Categoria>();
+            var e =  await set.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            return e is null ? null : ToDomain(new Categoria(e.Id,  e.Nombre, e.Descripcion));
         }
 
         public async Task AddAsync(Categoria categoria)
         {
-            var set = _context.Set<categorium>();
-            var e = ToEntity(categoria);
-            await set.AddAsync(e);
-            await _context.SaveChangesAsync();
-
-            // Si necesitas reflejar el Id generado en la entidad de dominio:
-            // typeof(Categoria).GetProperty(nameof(Categoria.Id))!.SetValue(categoria, e.id_categoria);
+            var set = _context.Set<Categoria>();
+            await set.AddAsync(categoria);
+            await  _context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(Categoria categoria)
         {
-            var set = _context.Set<categorium>();
-            var e = ToEntity(categoria);
+            var set = _context.Set<Categoria>();
+            var e = await set.FirstOrDefaultAsync(x => x.Id == categoria.Id);
+            if (e is null) throw new InvalidOperationException("Categoría no encontrada");
 
-            set.Attach(e);
-            _context.Entry(e).Property(x => x.nombre).IsModified = true;
-            _context.Entry(e).Property(x => x.descripcion).IsModified = true;
+            e.Nombre = categoria.Nombre;
+            e.Descripcion = categoria.Descripcion;
 
+            _context.Entry(e).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id)
         {
-            var set = _context.Set<categorium>();
-            var e = await set.FirstOrDefaultAsync(x => x.id_categoria == id);
-            if (e is null) return;
+            var set = _context.Set<Categoria>();
+            var e = await set.FirstOrDefaultAsync(x => x.Id == id);
+            if (e is null) throw new InvalidOperationException("Categoría no encontrada");
 
             set.Remove(e);
             await _context.SaveChangesAsync();

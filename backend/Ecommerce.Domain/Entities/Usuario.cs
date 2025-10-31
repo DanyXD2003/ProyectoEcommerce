@@ -12,13 +12,14 @@ namespace Ecommerce.Domain.Entities
         public string? Telefono { get; private set; }
         public string Rol { get; private set; }
         public DateTime FechaRegistro { get; set; }
+        public string? token_recuperacion { get; set; }
+        public DateTime? fecha_expiracion_token { get; set; }
 
-        /*
         // Relaciones (pueden representarse como colecciones del dominio)
         public ICollection<Direccion> Direcciones { get; private set; } = new List<Direccion>();
         public ICollection<MetodoPago> MetodosPago { get; private set; } = new List<MetodoPago>();
         public ICollection<Pedido> Pedidos { get; private set; } = new List<Pedido>();
-        */
+
         // Constructor principal
         public Usuario(string nombre, string apellido, string correo, string contrasenaHash, string rol)
         {
@@ -52,28 +53,5 @@ namespace Ecommerce.Domain.Entities
             FechaRegistro = fechaRegistro ?? DateTime.UtcNow;
         }
 
-        /*
-        // Métodos del dominio (reglas de negocio)
-        public void CambiarContraseña(string nuevoHash)
-        {
-            if (string.IsNullOrWhiteSpace(nuevoHash))
-                throw new ArgumentException("La nueva contraseña no puede estar vacía.");
-
-            ContrasenaHash = nuevoHash;
-        }
-
-        public void ActualizarTelefono(string telefono)
-        {
-            if (telefono?.Length > 30)
-                throw new ArgumentException("El teléfono no puede tener más de 30 caracteres.");
-
-            Telefono = telefono;
-        }
-
-        public void ActualizarRol(string nuevoRol)
-        {
-            Rol = nuevoRol;
-        }
-        */
     }
 }
