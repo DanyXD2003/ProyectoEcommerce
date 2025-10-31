@@ -55,5 +55,25 @@ namespace Ecommerce.API.Controllers
                 return StatusCode(500, new { mensaje = ex.Message });
             }
         }
+
+       // Endpoint GET api/usuario/buscar/{correo}
+        [HttpGet("buscar/{correo}")]
+        public async Task<IActionResult> BuscarPorCorreo(string correo)
+        {
+            var usuario = await _usuarioService.BuscarPorCorreoAsync(correo);
+
+            if (usuario == null)
+                return NotFound("Usuario no encontrado");
+
+            return Ok(new
+            {
+                usuario.Id,
+                usuario.Nombre,
+                usuario.Apellido,
+                usuario.Correo,
+                usuario.Pedidos,
+                usuario.Direcciones
+            });
+        } 
     }
 }

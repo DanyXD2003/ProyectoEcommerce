@@ -44,7 +44,8 @@ namespace Ecommerce.Application.Services
         // Método para registrar un nuevo usuario
         public async Task<Usuario> RegistrarUsuarioAsync(UsuarioRegistroDTO dto)
         {
-            try {
+            try
+            {
                 var usuario = _mapper.Map<Usuario>(dto);
                 usuario.FechaRegistro = DateTime.UtcNow;
 
@@ -56,6 +57,11 @@ namespace Ecommerce.Application.Services
                 Console.WriteLine($"[ERROR SQL] {ex.InnerException?.Message ?? ex.Message}");
                 throw;
             }
+        }
+         // Método para buscar un usuario por correo
+        public async Task<Usuario?> BuscarPorCorreoAsync(string correo)
+        {
+            return await _usuarioRepository.GetByCorreoAsync(correo);
         }
     }
 }
