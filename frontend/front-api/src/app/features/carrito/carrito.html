@@ -1,0 +1,129 @@
+<div class="d-flex flex-column min-vh-100 bg-background-light text-text-neutral">
+
+  <!-- Navbar -->
+  <header class="navbar navbar-expand-md sticky-top bg-background-light border-bottom shadow-sm py-3 px-4">
+    <div class="container d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center gap-2 text-dark-blue">
+        <svg fill="currentColor" width="28" height="28" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+          <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"></path>
+        </svg>
+        <h2 class="h5 fw-bold m-0">MisVentas</h2>
+      </div>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <nav id="navbarNav" class="collapse navbar-collapse">
+        <ul class="navbar-nav ms-auto gap-4">
+          <li class="nav-item"><a routerLink="/home" class="nav-link text-dark-blue fw-medium">Inicio</a></li>
+          <li class="nav-item"><a routerLink="/productos" class="nav-link text-dark-blue fw-medium">Productos</a></li>
+          <li class="nav-item"><a routerLink="/cart" class="nav-link text-dark-blue fw-medium">Carrito</a></li>
+          <li class="nav-item"><a routerLink="/profile" class="nav-link text-dark-blue fw-medium">Perfil</a></li>
+
+          <li class="nav-item" *ngIf="!isLogged">
+            <a routerLink="/login" class="btn btn-primary ms-3">Iniciar sesión</a>
+          </li>
+
+          <li class="nav-item d-flex align-items-center gap-3" *ngIf="isLogged">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor"
+              class="bi bi-person-fill text-dark-blue">
+              <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+            </svg>
+            <button class="btn btn-outline-danger d-flex align-items-center gap-2" (click)="logout()">
+              <span class="material-symbols-outlined">logout</span>
+              Salir
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Contenido del carrito -->
+  <section class="container py-5">
+    <div class="row g-4">
+
+      <!-- Card 1: Productos en carrito -->
+      <div class="col-12">
+        <div class="card shadow-sm rounded-4 p-4">
+          <h5 class="text-dark-blue fw-bold mb-3">Mi Carrito</h5>
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th>Nombre Producto</th>
+                <th>Precio Unidad</th>
+                <th>Cantidad</th>
+                <th>Subtotal</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of cartItems; let i = index">
+                <td>{{ item.nombre }}</td>
+                <td>Q. {{ item.precio }}</td>
+                <td>{{ item.cantidad }}</td>
+                <td>Q. {{ item.precio * item.cantidad }}</td>
+                <td>
+                  <button class="btn btn-outline-danger btn-sm" (click)="eliminarItem(i)">Eliminar</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Card 2: Resumen del pedido -->
+      <div class="col-12 col-lg-6">
+        <div class="card shadow-sm rounded-4 p-4">
+          <h5 class="text-dark-blue fw-bold mb-3">Resumen del pedido</h5>
+          <p>Total: <strong>Q. {{ total }}</strong></p>
+          <div class="d-flex gap-2 flex-wrap">
+            <button class="btn btn-outline-celeste" routerLink="/productos">Seguir comprando</button>
+            <button class="btn btn-primary" (click)="irAPagar()">Ir a pagar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Información de pago -->
+      <div class="col-12 col-lg-6">
+        <div class="card shadow-sm rounded-4 p-4">
+          <h5 class="text-dark-blue fw-bold mb-3">Información de pago</h5>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Nombre en tarjeta</label>
+            <input class="form-control" placeholder="Nombre completo">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Número de tarjeta</label>
+            <input class="form-control" placeholder="XXXX-XXXX-XXXX-XXXX">
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label class="form-label fw-semibold">Fecha expiración</label>
+              <input class="form-control" placeholder="MM/AA">
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold">CVV</label>
+              <input class="form-control" placeholder="123">
+            </div>
+          </div>
+          <button class="btn btn-primary w-100" (click)="irAPagar()">Pagar ahora</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-white border-top py-4 mt-auto">
+    <div class="container d-flex flex-column flex-sm-row justify-content-between align-items-center">
+      <div class="d-flex align-items-center gap-2 text-dark-blue">
+        <svg fill="currentColor" width="24" height="24" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+          <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"></path>
+        </svg>
+        <span class="fw-bold">MisVentas</span>
+      </div>
+      <small class="text-muted">© 2025 MisVentas Inc. Todos los derechos reservados - Ing favorito: Gustavito Méndez.</small>
+    </div>
+  </footer>
+</div>

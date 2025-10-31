@@ -46,9 +46,7 @@ namespace Ecommerce.Application.Services
         {
             try {
                 var usuario = _mapper.Map<Usuario>(dto);
-
-                // Forzar la fecha como "local" (sin zona horaria)
-                usuario.FechaRegistro = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified);
+                usuario.FechaRegistro = DateTime.UtcNow;
 
                 await _usuarioRepository.AddAsync(usuario);
                 return usuario;

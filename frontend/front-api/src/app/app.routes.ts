@@ -6,6 +6,7 @@ import { home } from './features/home/home';
 import { productos } from './features/productos/productos';
 import { recovery } from './features/auth/recovery/recovery';
 import { ProfileComponent } from './features/auth/profile/profile';
+import { carrito } from './features/carrito/carrito';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -15,5 +16,6 @@ export const routes: Routes = [
   { path: 'register', component: Register },
   { path: 'recovery', component: recovery },
   { path: 'profile', component: ProfileComponent },
+  { path: 'carrito', component: carrito },
   { path: 'dashboard', component: Register, canActivate: [AuthGuard] }
 ];
