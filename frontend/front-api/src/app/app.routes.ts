@@ -5,6 +5,7 @@ import { AuthGuard } from './core/guards/auth.guard';
 import { home } from './features/home/home';
 import { productos } from './features/productos/productos';
 import { recovery } from './features/auth/recovery/recovery';
+import { ProfileComponent } from './features/auth/profile/profile';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -13,5 +14,6 @@ export const routes: Routes = [
   { path: 'login', component: Login },
   { path: 'register', component: Register },
   { path: 'recovery', component: recovery },
+  { path: 'profile', component: ProfileComponent },
   { path: 'dashboard', component: Register, canActivate: [AuthGuard] }
 ];

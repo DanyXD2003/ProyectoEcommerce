@@ -34,33 +34,39 @@ export class Login {
       next: (response: any) => {
         console.log('Respuesta del backend:', response);
 
-        // Guardar token o usuario según el backend
-        if (response.token) {
-          localStorage.setItem('access_token', response.token);
-        }
-        if (response.usuario) {
-          localStorage.setItem('usuario', JSON.stringify(response.usuario));
-        } else {
-          localStorage.setItem('usuario', JSON.stringify(response));
-        }
+      // Guardar el token si existe
+      if (response.Token || response.token) {
+        const token = response.Token || response.token;
+        localStorage.setItem('access_token', token);
+      }
 
+      // Si viene un usuario, guárdalo
+      if (response.usuario) {
+        localStorage.setItem('usuario', JSON.stringify(response.usuario));
+      }
 
+      // Si NO viene usuario, crea un usuario básico
+      else {
+        localStorage.setItem('usuario', JSON.stringify({ nombre: this.Correo }));
+}
         // Abrir modal de éxito
         const dialogRef = this.dialog.open(AlertModalComponent, {
           data: {
             title: 'Inicio de sesión exitoso',
-            message: `Bienvenido, ${response.nombre || 'usuario'}`
+            message: `Bienvenido`
           },
-              width: '450px',        // ancho estándar
-              minWidth: '320px',     // para móviles
-              maxWidth: '90vw',      // no exceder 90% del viewport
-              height: '150px',        // para que la altura se ajuste
+              width: '450px',        
+              minWidth: '320px',   
+              maxWidth: '90vw',      
+              height: '150px',      
               panelClass: 'mat-mdc-dialog-container'
         });
 
         // Cuando el usuario cierre el modal, redirige
         dialogRef.afterClosed().subscribe(() => {
-          this.router.navigate(['/home']);
+          this.router.navigate(['/home']).then(() => {
+            window.location.reload(); 
+          });
         });
       },
       error: (error: any) => {

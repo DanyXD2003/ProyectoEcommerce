@@ -18,10 +18,17 @@ export class home implements OnInit {
   constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit() {
-    this.isLogged = this.authService.isLoggedIn();
-    const user = this.authService.getUser();
-    this.userName = user ? user.nombre : '';
-  }
+  console.log("Token desde home:", localStorage.getItem('access_token'));
+
+  this.isLogged = this.authService.isLoggedIn();
+  console.log("¿Está logueado?:", this.isLogged);
+
+  const user = this.authService.getUser();
+  console.log("Usuario recuperado:", user);
+
+  this.userName = user ? (user.nombre || user.correo || 'Usuario') : '';
+}
+
 
   logout() {
     this.authService.logout();
