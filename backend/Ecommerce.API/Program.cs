@@ -1,9 +1,14 @@
 using Ecommerce.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Ecommerce.Domain.Repositories;
+using Ecommerce.Application.Services;
+using Ecommerce.Infrastructure.Repositories;
+
 using Ecommerce.Application.Mappers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,9 +26,15 @@ builder.Services.AddSwaggerGen();
 // AutoMappers
 builder.Services.AddAutoMapper(typeof(UsuarioProfile));
 
-// Controladores
-//builder.Services.AddScoped<UsuarioService>();
-//builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+// Repositorios
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+
+// Servicios de aplicación
+builder.Services.AddScoped<UsuarioService>();
+
+// Generador de JWT
+builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+
 
 // CORS Configuration para Angular en localhost:4200
 builder.Services.AddCors(options =>

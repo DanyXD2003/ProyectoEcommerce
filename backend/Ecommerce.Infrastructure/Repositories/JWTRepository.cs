@@ -7,7 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Ecommerce.Domain.Entities;
 using Ecommerce.Domain.Repositories;
 
-namespace WebFinal.Infrastructure.Security
+namespace Ecommerce.Infrastructure.Repositories
 {
     public class JwtTokenGenerator : IJwtTokenGenerator
     {
