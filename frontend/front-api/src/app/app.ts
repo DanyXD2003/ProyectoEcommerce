@@ -4,10 +4,11 @@ import { Login } from "./features/auth/login/login";
 import { FormsModule } from '@angular/forms';
 import { home } from "./features/home/home";
 import { productos } from "./features/productos/productos";
+import { ProfileComponent } from './features/auth/profile/profile';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Login, FormsModule, home, productos],
+  imports: [RouterOutlet, Login, FormsModule, home, productos, ProfileComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

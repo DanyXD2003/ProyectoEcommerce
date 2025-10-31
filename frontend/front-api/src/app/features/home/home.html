@@ -18,19 +18,21 @@
           <li class="nav-item"><a routerLink="/home" class="nav-link text-dark-blue fw-medium">Inicio</a></li>
           <li class="nav-item"><a routerLink="/productos" class="nav-link text-dark-blue fw-medium">Productos</a></li>
           <li class="nav-item"><a href="#" class="nav-link text-dark-blue fw-medium">Carrito</a></li>
-          <li class="nav-item"><a href="#" class="nav-link text-dark-blue fw-medium">Perfil</a></li>
+          <li class="nav-item"><a routerLink="/profile" class="nav-link text-dark-blue fw-medium">Perfil</a></li>
+
           <!-- SI NO ESTÁ LOGUEADO -->
           <li class="nav-item" *ngIf="!isLogged">
             <a routerLink="/login" class="btn btn-primary ms-3 fixed-btn">Iniciar sesión</a>
           </li>
 
           <!-- SI ESTÁ LOGUEADO -->
-          <li class="nav-item" *ngIf="isLogged">
-            <span class="nav-link text-dark-blue fw-medium">Hola, {{ userName }}</span>
-          </li>
+          <li class="nav-item d-flex align-items-center gap-3" *ngIf="isLogged">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor"
+              class="bi bi-person-fill text-dark-blue">
+              <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+            </svg>
 
-          <li class="nav-item" *ngIf="isLogged">
-            <button class="btn btn-outline-danger ms-3" (click)="logout()">Cerrar sesión</button>
+            <button class="btn btn-outline-danger" (click)="logout()">Salir</button>
           </li>
 
         </ul>
@@ -50,7 +52,10 @@
         </p>
         <div class="d-flex gap-3">
           <a class="btn btn-primary btn-lg fixed-btn" routerLink="/productos" >Explorar productos</a>
-          <button class="btn btn-outline-celeste btn-lg fw-bold" routerLink="/login">Comenzar Ahora</button>
+          <!-- Solo si NO está loggeado -->
+          <button *ngIf="!isLogged" class="btn btn-outline-celeste btn-lg fw-bold" routerLink="/register">
+            Comenzar Ahora
+          </button>
         </div>
       </div>
       <div class="col-lg-6">
