@@ -9,7 +9,6 @@ namespace Ecommerce.Domain.Entities
         public string? Apellido { get; private set; }
         public string Correo { get; private set; }
         public string ContrasenaHash { get; private set; }
-        public string? Telefono { get; private set; }
         public string Rol { get; private set; }
         public DateTime FechaRegistro { get; set; }
         public string? token_recuperacion { get; set; }
@@ -41,14 +40,14 @@ namespace Ecommerce.Domain.Entities
         }
 
         // Constructor usado para rehidratar desde la capa de persistencia
-        public Usuario(int id, string nombre, string? apellido, string correo, string contrasenaHash, string? telefono, string? rol, DateTime? fechaRegistro)
+        public Usuario(int id, string nombre, string? apellido, string correo, string contrasenaHash, string? rol, DateTime? fechaRegistro)
         {
             Id = id;
             Nombre = nombre;
             Apellido = apellido;
             Correo = correo ?? throw new ArgumentException("El correo no puede estar vacío.", nameof(correo));
             ContrasenaHash = contrasenaHash ?? throw new ArgumentException("La contraseña no puede estar vacía.", nameof(contrasenaHash));
-            Telefono = telefono;
+
             Rol = rol ?? string.Empty;
             FechaRegistro = fechaRegistro ?? DateTime.UtcNow;
         }
