@@ -11,17 +11,52 @@ namespace Ecommerce.Infrastructure.Repositories
         private readonly EcommerceDbContext _context;
         public UsuarioRepository(EcommerceDbContext context) => _context = context;
 
-        private static Usuario ToDomain(Usuario e) =>
-            // usar el constructor de rehidratación del dominio
-            new Usuario(
-                e.Id,
-                e.Nombre,
-                e.Apellido,
-                e.Correo,
-                e.ContrasenaHash,
-                e.Telefono,
-                e.Rol,
-                e.FechaRegistro);
+private static Usuario ToDomain(Usuario e)
+{
+    // Crear el usuario base con el constructor de rehidratación
+    var usuario = new Usuario(
+        e.Nombre,
+        e.Apellido,
+        e.Correo,
+        e.ContrasenaHash,
+        e.Rol
+    );
+
+    // Rehidratar las relaciones si existen
+    if (e.Direcciones != null && e.Direcciones.Any())
+    {
+        foreach (var d in e.Direcciones)
+        {
+            usuario.Direcciones.Add(new Direccion(
+                d.Id,
+                d.UsuarioId,
+                d.Calle,
+                d.Ciudad,
+                d.Departamento,
+                d.CodigoPostal,
+                d.Pais
+            ));
+        }
+    }
+
+    if (e.MetodosPago != null && e.MetodosPago.Any())
+    {
+        foreach (var mp in e.MetodosPago)
+        {
+            usuario.MetodosPago.Add(mp); // Ajusta si tu clase dominio necesita un constructor específico
+        }
+    }
+
+    if (e.Pedidos != null && e.Pedidos.Any())
+    {
+        foreach (var p in e.Pedidos)
+        {
+            usuario.Pedidos.Add(p);
+        }
+    }
+
+    return usuario;
+}
 
         public async Task<Usuario?> GetByIdAsync(int id)
         {
@@ -31,7 +66,13 @@ namespace Ecommerce.Infrastructure.Repositories
 
         public async Task<Usuario?> GetByCorreoAsync(string correo)
         {
-            var e = await _context.Usuarios.AsNoTracking().FirstOrDefaultAsync(u => u.Correo == correo);
+            var e = await _context.Usuarios
+                .Include(u => u.Direcciones)
+                .Include(u => u.MetodosPago)
+                .Include(u => u.Pedidos)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Correo == correo);
+
             return e is null ? null : ToDomain(e);
         }
 
