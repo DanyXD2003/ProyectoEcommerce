@@ -30,10 +30,13 @@ namespace Ecommerce.Infrastructure.Repositories
 
             var credentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
             var tokenDescriptor = new JwtSecurityToken(
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
                 claims: claims,
                 expires: DateTime.UtcNow.AddHours(1),
                 signingCredentials: credentials
             );
+
 
             return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
         }

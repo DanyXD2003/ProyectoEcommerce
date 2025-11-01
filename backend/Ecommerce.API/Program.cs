@@ -3,40 +3,39 @@ using Microsoft.EntityFrameworkCore;
 using Ecommerce.Domain.Repositories;
 using Ecommerce.Application.Services;
 using Ecommerce.Infrastructure.Repositories;
-
 using Ecommerce.Application.Mappers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
-// DbContext PostgreSQL (Neon)
+// ----------------------
+// Configuración de DbContext
+// ----------------------
 var connectionString = builder.Configuration.GetConnectionString("Postgres");
 builder.Services.AddDbContext<EcommerceDbContext>(options =>
     options.UseNpgsql(connectionString));
 
+// ----------------------
+// AutoMapper
+// ----------------------
+builder.Services.AddAutoMapper(typeof(UsuarioProfile), typeof(DireccionProfile));
 
-// Servicios base
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-// AutoMappers
-builder.Services.AddAutoMapper(typeof(UsuarioProfile));
-
-// Repositorios
+// ----------------------
+// Repositorios y servicios
+// ----------------------
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
-
-// Servicios de aplicación
 builder.Services.AddScoped<UsuarioService>();
-
-// Generador de JWT
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<IDireccionRepository, DireccionRepository>();
+builder.Services.AddScoped<DireccionService>();
 
 
-// CORS Configuration para Angular en localhost:4200
+// ----------------------
+// CORS (para Angular localhost)
+// ----------------------
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AngularLocalhost", policy =>
@@ -44,12 +43,13 @@ builder.Services.AddCors(options =>
         policy.WithOrigins("http://localhost:4200", "https://localhost:4200")
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials(); // Importante si usas cookies o autenticación
+              .AllowCredentials();
     });
 });
 
-//builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
-
+// ----------------------
+// JWT Authentication
+// ----------------------
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -65,24 +65,70 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+// ----------------------
+// Swagger/OpenAPI
+// ----------------------
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new() { Title = "Ecommerce API", Version = "v1" });
+
+    // Configuración JWT Bearer para Swagger
+    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Ingrese 'Bearer' seguido de su token JWT"
+    });
+
+    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
+// ----------------------
+// Controllers
+// ----------------------
+builder.Services.AddControllers()
+    .AddJsonOptions(opt =>
+    {
+        opt.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
+
 
 var app = builder.Build();
+
+// ----------------------
+// Pipeline Middleware
+// ----------------------
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Ecommerce API v1");
+});
+
+app.UseHttpsRedirection();
+
+// CORS debe ir antes de UseAuthorization
+app.UseCors("AngularLocalhost");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Middleware pipeline
-app.UseSwagger();
-app.UseSwaggerUI();
-
-app.UseHttpsRedirection();
-
-// CORS debe ir después de UseHttpsRedirection y antes de UseAuthorization
-app.UseCors("AngularLocalhost");
-
-app.UseAuthorization();
-
-// Expone controllers
 app.MapControllers();
 
 app.Run();
