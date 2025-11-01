@@ -40,6 +40,8 @@ export class Login {
         localStorage.setItem('access_token', token);
       }
 
+      localStorage.setItem('correoUsuario', this.Correo); 
+
       // Si viene un usuario, guárdalo
       if (response.usuario) {
         localStorage.setItem('usuario', JSON.stringify(response.usuario));

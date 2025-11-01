@@ -34,7 +34,13 @@ namespace Ecommerce.API.Controllers
             if (token == null)
                 return Unauthorized("Correo o contraseña incorrectos");
 
-            return Ok(new { Token = token });
+            /*// ✅ Recuperar datos del usuario para enviarlos al frontend
+            var usuario = await _usuarioService.BuscarPorCorreoAsync(dto.Correo);*/
+
+            return Ok(new { 
+                Token = token,
+                //Correo = usuario.Correo,
+            });
         }
 
 

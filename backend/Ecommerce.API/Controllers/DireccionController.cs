@@ -26,7 +26,10 @@ namespace Ecommerce.API.Controllers
             try
             {
                 var authHeader = HttpContext.Request.Headers["Authorization"].ToString();
-                var token = authHeader.Substring("Bearer ".Length).Trim();
+                var token = authHeader.StartsWith("Bearer ")
+                    ? authHeader.Substring("Bearer ".Length).Trim()
+                    : authHeader.Trim();
+                Console.WriteLine(token);
                 var usuarioId = _jwtService.GetUserIdFromToken(token) ?? throw new UnauthorizedAccessException("Token inválido");
 
                 var direccion = await _direccionService.CrearDireccionAsync(usuarioId, dto);
