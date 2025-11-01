@@ -34,7 +34,8 @@ private static Usuario ToDomain(Usuario e)
                 d.Ciudad,
                 d.Departamento,
                 d.CodigoPostal,
-                d.Pais
+                d.Pais,
+                d.Telefono
             ));
         }
     }
