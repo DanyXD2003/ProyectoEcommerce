@@ -20,7 +20,7 @@ builder.Services.AddDbContext<EcommerceDbContext>(options =>
 // ----------------------
 // AutoMapper
 // ----------------------
-builder.Services.AddAutoMapper(typeof(UsuarioProfile), typeof(DireccionProfile));
+builder.Services.AddAutoMapper(typeof(UsuarioProfile), typeof(DireccionProfile), typeof(ProductoProfile), typeof(CarritoProfile));
 
 // ----------------------
 // Repositorios y servicios
@@ -31,6 +31,10 @@ builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<IDireccionRepository, DireccionRepository>();
 builder.Services.AddScoped<DireccionService>();
+builder.Services.AddScoped<IProductoRepository, ProductoRepository>();
+builder.Services.AddScoped<ProductoService>();
+builder.Services.AddScoped<CarritoService>();
+
 
 
 // ----------------------

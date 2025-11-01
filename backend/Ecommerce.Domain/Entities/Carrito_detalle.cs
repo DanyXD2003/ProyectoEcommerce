@@ -7,6 +7,7 @@ public class CarritoDetalle
     public int ProductoId { get; private set; }
     public int Cantidad { get; private set; }
     public decimal PrecioUnitario { get; private set; }
+    public decimal Subtotal => Cantidad * PrecioUnitario;
 
     public Carrito? Carrito { get; private set; }
 
