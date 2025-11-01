@@ -8,11 +8,32 @@ namespace Ecommerce.Application.Mappers
     {
         public ProductoProfile()
         {
-            // Mapear Producto (dominio) -> InfoProductoDTO
-            CreateMap<Producto, InfoProductoDTO>()
-                .ForMember(dest => dest.Nombre, opt => opt.MapFrom(src => src.Nombre))
-                .ForMember(dest => dest.Descripcion, opt => opt.MapFrom(src => src.Descripcion))
-                .ForMember(dest => dest.Precio, opt => opt.MapFrom(src => src.Precio));
+            // Mapeo: CrearProductoDto -> Producto
+            CreateMap<CrearProductoDto, Producto>()
+                .ConstructUsing(dto => new Producto(
+                    dto.CategoriaId,
+                    dto.Nombre,
+                    dto.Precio,
+                    dto.Stock,
+                    dto.Activo,
+                    dto.Descripcion
+                ));
+
+            // Mapeo: ActualizarProductoDto -> Producto
+            CreateMap<ActualizarProductoDto, Producto>()
+                .ConstructUsing(dto => new Producto(
+                    dto.CategoriaId,
+                    dto.Nombre,
+                    dto.Precio,
+                    dto.Stock,
+                    dto.Activo,
+                    dto.Descripcion
+                ));
+
+            // Mapeo: Producto -> ProductoDto
+            CreateMap<Producto, ProductoDto>()
+                .ForMember(dest => dest.CategoriaNombre,
+                           opt => opt.MapFrom(src => src.Categoria != null ? src.Categoria.Nombre : string.Empty));
         }
     }
 }

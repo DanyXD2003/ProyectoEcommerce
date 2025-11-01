@@ -5,6 +5,7 @@ public class Carrito
     public int Id { get; private set; }
     public int UsuarioId { get; private set; }
     public DateTime FechaCreacion { get; private set; }
+    public bool Activo { get; private set; } = true;
 
     // Relaciones (si las usas en Dominio)
     public Usuario? Usuario { get; private set; }
