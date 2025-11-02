@@ -112,5 +112,68 @@ namespace Ecommerce.API.Controllers
                 return StatusCode(500, new { mensaje = ex.Message });
             }
         }
+
+        //Actualizar la cantidad de un producto en el carrito
+        [HttpPut("actualizarCantidad")]
+        [Authorize]
+        public async Task<IActionResult> ActualizarCantidad([FromBody] ActualizarCantidadDto dto)
+        {
+            try
+            {
+                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                var usuarioId = _jwtService.GetUserIdFromToken(token) ?? throw new UnauthorizedAccessException("Token inválido");
+
+                var detalleActualizado = await _carritoService.ActualizarCantidadProductoAsync(usuarioId, dto);
+                return Ok(detalleActualizado);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Caso especial: se eliminó por cantidad 0
+                return Ok(new { mensaje = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { mensaje = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { mensaje = ex.Message });
+            }
+        }
+
+        //Aplicar un descuento al carrito activo
+        [HttpPost("aplicarDescuento")]
+        [Authorize]
+        public async Task<IActionResult> AplicarDescuento([FromBody] AplicarDescuentoDto dto)
+        {
+            try
+            {
+                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                var usuarioId = _jwtService.GetUserIdFromToken(token) ?? throw new UnauthorizedAccessException("Token inválido");
+
+                var carritoActualizado = await _carritoService.AplicarDescuentoAsync(usuarioId, dto.Codigo);
+                return Ok(carritoActualizado);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { mensaje = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { mensaje = ex.Message });
+            }
+        }
     }
 }

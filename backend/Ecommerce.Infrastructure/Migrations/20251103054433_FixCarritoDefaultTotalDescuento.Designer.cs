@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Ecommerce.Infrastructure.Migrations
 {
     [DbContext(typeof(EcommerceDbContext))]
-    [Migration("20251031064623_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20251103054433_FixCarritoDefaultTotalDescuento")]
+    partial class FixCarritoDefaultTotalDescuento
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,21 +25,6 @@ namespace Ecommerce.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("DescuentoPedido", b =>
-                {
-                    b.Property<int>("DescuentosId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("PedidosId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("DescuentosId", "PedidosId");
-
-                    b.HasIndex("PedidosId");
-
-                    b.ToTable("DescuentoPedido");
-                });
-
             modelBuilder.Entity("Ecommerce.Domain.Entities.Carrito", b =>
                 {
                     b.Property<int>("Id")
@@ -48,13 +33,27 @@ namespace Ecommerce.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("Activo")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("DescuentoId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("TotalDescuento")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasDefaultValue(0m);
 
                     b.Property<int>("UsuarioId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DescuentoId");
 
                     b.HasIndex("UsuarioId");
 
@@ -76,7 +75,8 @@ namespace Ecommerce.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.Property<decimal>("PrecioUnitario")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<int>("ProductoId")
                         .HasColumnType("integer");
@@ -126,16 +126,12 @@ namespace Ecommerce.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Descripcion")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("FechaFin")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("FechaInicio")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<decimal>("Porcentaje")
-                        .HasColumnType("numeric");
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)");
 
                     b.HasKey("Id");
 
@@ -165,6 +161,9 @@ namespace Ecommerce.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Pais")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Telefono")
                         .HasColumnType("text");
 
                     b.Property<int>("UsuarioId")
@@ -248,14 +247,25 @@ namespace Ecommerce.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("DireccionId")
+                    b.Property<int>("CarritoId")
                         .HasColumnType("integer");
+
+                    b.Property<int>("DireccionId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("FechaPedido")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("MetodoPagoId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("TipoPago")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<decimal>("Total")
                         .HasColumnType("numeric");
@@ -264,6 +274,8 @@ namespace Ecommerce.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CarritoId");
 
                     b.HasIndex("DireccionId");
 
@@ -289,7 +301,8 @@ namespace Ecommerce.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.Property<decimal>("PrecioUnitario")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<int>("ProductoId")
                         .HasColumnType("integer");
@@ -367,9 +380,6 @@ namespace Ecommerce.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Telefono")
-                        .HasColumnType("text");
-
                     b.Property<DateTime?>("fecha_expiracion_token")
                         .HasColumnType("timestamp with time zone");
 
@@ -381,28 +391,19 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.ToTable("Usuarios");
                 });
 
-            modelBuilder.Entity("DescuentoPedido", b =>
-                {
-                    b.HasOne("Ecommerce.Domain.Entities.Descuento", null)
-                        .WithMany()
-                        .HasForeignKey("DescuentosId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Ecommerce.Domain.Entities.Pedido", null)
-                        .WithMany()
-                        .HasForeignKey("PedidosId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Ecommerce.Domain.Entities.Carrito", b =>
                 {
+                    b.HasOne("Ecommerce.Domain.Entities.Descuento", "Descuento")
+                        .WithMany("Carritos")
+                        .HasForeignKey("DescuentoId");
+
                     b.HasOne("Ecommerce.Domain.Entities.Usuario", "Usuario")
                         .WithMany()
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Descuento");
 
                     b.Navigation("Usuario");
                 });
@@ -447,7 +448,7 @@ namespace Ecommerce.Infrastructure.Migrations
             modelBuilder.Entity("Ecommerce.Domain.Entities.Pago", b =>
                 {
                     b.HasOne("Ecommerce.Domain.Entities.Pedido", "Pedido")
-                        .WithMany("Pagos")
+                        .WithMany()
                         .HasForeignKey("PedidoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -457,9 +458,17 @@ namespace Ecommerce.Infrastructure.Migrations
 
             modelBuilder.Entity("Ecommerce.Domain.Entities.Pedido", b =>
                 {
+                    b.HasOne("Ecommerce.Domain.Entities.Carrito", "Carrito")
+                        .WithMany()
+                        .HasForeignKey("CarritoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Ecommerce.Domain.Entities.Direccion", "Direccion")
                         .WithMany("Pedidos")
-                        .HasForeignKey("DireccionId");
+                        .HasForeignKey("DireccionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Ecommerce.Domain.Entities.MetodoPago", "MetodoPago")
                         .WithMany("Pedidos")
@@ -470,6 +479,8 @@ namespace Ecommerce.Infrastructure.Migrations
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Carrito");
 
                     b.Navigation("Direccion");
 
@@ -518,6 +529,11 @@ namespace Ecommerce.Infrastructure.Migrations
                     b.Navigation("Productos");
                 });
 
+            modelBuilder.Entity("Ecommerce.Domain.Entities.Descuento", b =>
+                {
+                    b.Navigation("Carritos");
+                });
+
             modelBuilder.Entity("Ecommerce.Domain.Entities.Direccion", b =>
                 {
                     b.Navigation("Pedidos");
@@ -531,8 +547,6 @@ namespace Ecommerce.Infrastructure.Migrations
             modelBuilder.Entity("Ecommerce.Domain.Entities.Pedido", b =>
                 {
                     b.Navigation("Detalles");
-
-                    b.Navigation("Pagos");
                 });
 
             modelBuilder.Entity("Ecommerce.Domain.Entities.Producto", b =>

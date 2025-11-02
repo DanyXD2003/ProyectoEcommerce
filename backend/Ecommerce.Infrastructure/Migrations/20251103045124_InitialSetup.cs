@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Ecommerce.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialSetup : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -33,10 +33,8 @@ namespace Ecommerce.Infrastructure.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Codigo = table.Column<string>(type: "text", nullable: false),
-                    Descripcion = table.Column<string>(type: "text", nullable: true),
-                    Porcentaje = table.Column<decimal>(type: "numeric", nullable: false),
-                    FechaInicio = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    FechaFin = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Descripcion = table.Column<string>(type: "text", nullable: false),
+                    Porcentaje = table.Column<decimal>(type: "numeric(5,2)", precision: 5, scale: 2, nullable: false),
                     Activo = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -54,7 +52,6 @@ namespace Ecommerce.Infrastructure.Migrations
                     Apellido = table.Column<string>(type: "text", nullable: true),
                     Correo = table.Column<string>(type: "text", nullable: false),
                     ContrasenaHash = table.Column<string>(type: "text", nullable: false),
-                    Telefono = table.Column<string>(type: "text", nullable: true),
                     Rol = table.Column<string>(type: "text", nullable: false),
                     FechaRegistro = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     token_recuperacion = table.Column<string>(type: "text", nullable: true),
@@ -96,11 +93,19 @@ namespace Ecommerce.Infrastructure.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UsuarioId = table.Column<int>(type: "integer", nullable: false),
-                    FechaCreacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    FechaCreacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Activo = table.Column<bool>(type: "boolean", nullable: false),
+                    DescuentoId = table.Column<int>(type: "integer", nullable: true),
+                    TotalDescuento = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Carritos", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Carritos_Descuentos_DescuentoId",
+                        column: x => x.DescuentoId,
+                        principalTable: "Descuentos",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Carritos_Usuarios_UsuarioId",
                         column: x => x.UsuarioId,
@@ -120,7 +125,8 @@ namespace Ecommerce.Infrastructure.Migrations
                     Ciudad = table.Column<string>(type: "text", nullable: false),
                     Departamento = table.Column<string>(type: "text", nullable: true),
                     CodigoPostal = table.Column<string>(type: "text", nullable: true),
-                    Pais = table.Column<string>(type: "text", nullable: true)
+                    Pais = table.Column<string>(type: "text", nullable: true),
+                    Telefono = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -165,7 +171,7 @@ namespace Ecommerce.Infrastructure.Migrations
                     CarritoId = table.Column<int>(type: "integer", nullable: false),
                     ProductoId = table.Column<int>(type: "integer", nullable: false),
                     Cantidad = table.Column<int>(type: "integer", nullable: false),
-                    PrecioUnitario = table.Column<decimal>(type: "numeric", nullable: false)
+                    PrecioUnitario = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -190,19 +196,29 @@ namespace Ecommerce.Infrastructure.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UsuarioId = table.Column<int>(type: "integer", nullable: false),
-                    DireccionId = table.Column<int>(type: "integer", nullable: true),
+                    DireccionId = table.Column<int>(type: "integer", nullable: false),
+                    CarritoId = table.Column<int>(type: "integer", nullable: false),
                     MetodoPagoId = table.Column<int>(type: "integer", nullable: true),
                     FechaPedido = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Total = table.Column<decimal>(type: "numeric", nullable: false)
+                    Total = table.Column<decimal>(type: "numeric", nullable: false),
+                    TipoPago = table.Column<string>(type: "text", nullable: false),
+                    Estado = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Pedidos", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_Pedidos_Carritos_CarritoId",
+                        column: x => x.CarritoId,
+                        principalTable: "Carritos",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_Pedidos_Direcciones_DireccionId",
                         column: x => x.DireccionId,
                         principalTable: "Direcciones",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Pedidos_MetodosPago_MetodoPagoId",
                         column: x => x.MetodoPagoId,
@@ -212,30 +228,6 @@ namespace Ecommerce.Infrastructure.Migrations
                         name: "FK_Pedidos_Usuarios_UsuarioId",
                         column: x => x.UsuarioId,
                         principalTable: "Usuarios",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "DescuentoPedido",
-                columns: table => new
-                {
-                    DescuentosId = table.Column<int>(type: "integer", nullable: false),
-                    PedidosId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DescuentoPedido", x => new { x.DescuentosId, x.PedidosId });
-                    table.ForeignKey(
-                        name: "FK_DescuentoPedido_Descuentos_DescuentosId",
-                        column: x => x.DescuentosId,
-                        principalTable: "Descuentos",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_DescuentoPedido_Pedidos_PedidosId",
-                        column: x => x.PedidosId,
-                        principalTable: "Pedidos",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -272,7 +264,7 @@ namespace Ecommerce.Infrastructure.Migrations
                     PedidoId = table.Column<int>(type: "integer", nullable: false),
                     ProductoId = table.Column<int>(type: "integer", nullable: false),
                     Cantidad = table.Column<int>(type: "integer", nullable: false),
-                    PrecioUnitario = table.Column<decimal>(type: "numeric", nullable: false)
+                    PrecioUnitario = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -302,14 +294,14 @@ namespace Ecommerce.Infrastructure.Migrations
                 column: "ProductoId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Carritos_DescuentoId",
+                table: "Carritos",
+                column: "DescuentoId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Carritos_UsuarioId",
                 table: "Carritos",
                 column: "UsuarioId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_DescuentoPedido_PedidosId",
-                table: "DescuentoPedido",
-                column: "PedidosId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Direcciones_UsuarioId",
@@ -335,6 +327,11 @@ namespace Ecommerce.Infrastructure.Migrations
                 name: "IX_PedidoDetalles_ProductoId",
                 table: "PedidoDetalles",
                 column: "ProductoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pedidos_CarritoId",
+                table: "Pedidos",
+                column: "CarritoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Pedidos_DireccionId",
@@ -364,25 +361,19 @@ namespace Ecommerce.Infrastructure.Migrations
                 name: "CarritoDetalles");
 
             migrationBuilder.DropTable(
-                name: "DescuentoPedido");
-
-            migrationBuilder.DropTable(
                 name: "Pagos");
 
             migrationBuilder.DropTable(
                 name: "PedidoDetalles");
 
             migrationBuilder.DropTable(
-                name: "Carritos");
-
-            migrationBuilder.DropTable(
-                name: "Descuentos");
-
-            migrationBuilder.DropTable(
                 name: "Pedidos");
 
             migrationBuilder.DropTable(
                 name: "Productos");
+
+            migrationBuilder.DropTable(
+                name: "Carritos");
 
             migrationBuilder.DropTable(
                 name: "Direcciones");
@@ -392,6 +383,9 @@ namespace Ecommerce.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Categorias");
+
+            migrationBuilder.DropTable(
+                name: "Descuentos");
 
             migrationBuilder.DropTable(
                 name: "Usuarios");

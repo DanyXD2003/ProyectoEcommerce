@@ -10,40 +10,21 @@ namespace Ecommerce.Infrastructure.Repositories
         private readonly EcommerceDbContext _context;
         public PedidoDetalleRepository(EcommerceDbContext context) => _context = context;
 
-        private static PedidoDetalle ToDomain(PedidoDetalle e) =>
-            new PedidoDetalle( e.Id, e.Cantidad, e.PrecioUnitario);
-
-        public async Task<IReadOnlyList<PedidoDetalle>> ListByPedidoAsync(int pedidoId)
+        // Obtener los detalles de un pedido específico
+        public async Task<IEnumerable<PedidoDetalle>> GetByPedidoIdAsync(int pedidoId)
         {
-            var list = await _context.PedidoDetalles
+            return await _context.PedidoDetalles
+                .Include(d => d.Producto)
+                .Where(d => d.PedidoId == pedidoId)
                 .AsNoTracking()
-                .Where(x => x.Id == pedidoId)
                 .ToListAsync();
-
-            return list.Select(ToDomain).ToList();
         }
 
-        public async Task AddAsync(PedidoDetalle d)
+        // Agregar un conjunto de detalles a un pedido
+        public async Task AddRangeAsync(IEnumerable<PedidoDetalle> detalles)
         {
-            _context.PedidoDetalles.Add(d);
+            await _context.PedidoDetalles.AddRangeAsync(detalles);
             await _context.SaveChangesAsync();
-        }
-
-        public async Task UpdateAsync(PedidoDetalle d)
-        {
-            _context.PedidoDetalles.Attach(d);
-            _context.Entry(d).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task DeleteAsync(int id)
-        {
-            var detalle = await _context.PedidoDetalles.FindAsync(id);
-            if (detalle != null)
-            {
-                _context.PedidoDetalles.Remove(detalle);
-                await _context.SaveChangesAsync();
-            }
         }
     }
 }

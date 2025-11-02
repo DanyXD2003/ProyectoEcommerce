@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Ecommerce.Application.DTOs;
 using Ecommerce.Application.Services;
-using Microsoft.AspNetCore.Authorization;
 using Ecommerce.Domain.Repositories;
 
 namespace Ecommerce.API.Controllers
@@ -11,45 +11,35 @@ namespace Ecommerce.API.Controllers
     public class UsuarioController : ControllerBase
     {
         private readonly UsuarioService _usuarioService;
-        private readonly JwtService _jwtService;
-
         private readonly IUsuarioRepository _usuarioRepository;
 
-        public UsuarioController(UsuarioService usuarioService, JwtService jwtService, IUsuarioRepository usuarioRepository)
+        public UsuarioController(UsuarioService usuarioService, IUsuarioRepository usuarioRepository)
         {
             _usuarioService = usuarioService;
-            _jwtService = jwtService;
             _usuarioRepository = usuarioRepository;
         }
 
-        // Endpoint POST api/usuario/login
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] UsuarioLoginDTO dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var token = await _usuarioService.LoginAsync(dto);
-
             if (token == null)
-                return Unauthorized("Correo o contraseña incorrectos");
+                return Unauthorized(new { mensaje = "Correo o contraseña incorrectos" });
 
-            /*// ✅ Recuperar datos del usuario para enviarlos al frontend
-            var usuario = await _usuarioService.BuscarPorCorreoAsync(dto.Correo);*/
-
-            return Ok(new { 
-                Token = token,
-                //Correo = usuario.Correo,
-            });
+            return Ok(new { token });
         }
 
-
-        // Endpoint POST api/usuario/registrar
         [HttpPost("registrar")]
+        [AllowAnonymous]
         public async Task<IActionResult> Registrar([FromBody] UsuarioRegistroDTO dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
             try
             {
                 var usuario = await _usuarioService.RegistrarUsuarioAsync(dto);
@@ -68,55 +58,34 @@ namespace Ecommerce.API.Controllers
             }
         }
 
-        // Endpoint GET api/usuario/GetInfoByCorreo}
         [HttpGet("GetInfoByCorreo")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetInfoByCorreo(string correo)
         {
-            var usuario = await _usuarioService.BuscarPorCorreoAsync(correo);
-
+            var usuario = await _usuarioService.ObtenerInfoPorCorreoAsync(correo);
             if (usuario == null)
-                return NotFound("Usuario no encontrado");
+                return NotFound(new { mensaje = "Usuario no encontrado" });
 
-            return Ok(new
-            {
-                usuario.Id,
-                usuario.Nombre,
-                usuario.Apellido,
-                usuario.Correo,
-                usuario.Pedidos,
-                usuario.Direcciones
-            });
-        } 
+            return Ok(usuario);
+        }
 
-        // GET api/usuario/buscar
+
         [HttpGet("buscar")]
         [Authorize]
         public async Task<IActionResult> Buscar()
         {
             try
             {
-                var authHeader = HttpContext.Request.Headers["Authorization"].ToString();
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdClaim))
+                    return Unauthorized(new { mensaje = "Token inválido o sin claim de usuario" });
 
-                if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
-                    return Unauthorized(new { message = "Token no proporcionado o inválido" });
-
-                var token = authHeader.Substring("Bearer ".Length).Trim();
-
-                var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
-                var jwt = handler.ReadJwtToken(token);
-
-                var claimsDebug = jwt.Claims.Select(c => new { c.Type, c.Value }).ToList();
-
-                var userIdClaim = jwt.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier);
-                if (userIdClaim == null)
-                    return Unauthorized(new { message = "No se encontró el claim NameIdentifier en el token", claims = claimsDebug });
-
-                if (!int.TryParse(userIdClaim.Value, out int userId))
-                    return Unauthorized(new { message = "El claim NameIdentifier no es un número válido", claims = claimsDebug });
+                if (!int.TryParse(userIdClaim, out int userId))
+                    return Unauthorized(new { mensaje = "El claim NameIdentifier no es válido" });
 
                 var usuario = await _usuarioRepository.GetByIdAsync(userId);
                 if (usuario == null)
-                    return NotFound(new { message = "Usuario no encontrado", claims = claimsDebug });
+                    return NotFound(new { mensaje = "Usuario no encontrado" });
 
                 return Ok(new
                 {
@@ -125,13 +94,84 @@ namespace Ecommerce.API.Controllers
                     usuario.Apellido,
                     usuario.Correo,
                     usuario.Rol,
-                    usuario.FechaRegistro,
-                    claims = claimsDebug  // opcional: retornar claims para depuración
+                    usuario.FechaRegistro
                 });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Error interno del servidor", detalle = ex.Message });
+                return StatusCode(500, new { mensaje = "Error interno del servidor", detalle = ex.Message });
+            }
+        }
+
+        [HttpGet("TraerTodos")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> TraerTodos()
+        {
+            try
+            {
+                var usuarios = await _usuarioService.TraerTodosAsync();
+                return Ok(usuarios);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { mensaje = ex.Message });
+            }
+        }
+
+        [HttpPost("AgregarUsuario")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> AgregarUsuario([FromBody] UsuarioRegistroAdminDTO dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var nuevoUsuario = await _usuarioService.AgregarUsuarioAsync(dto);
+                return Ok(nuevoUsuario);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { mensaje = ex.Message });
+            }
+        }
+
+        [HttpPut("ModificarUsuario/{id}")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> ModificarUsuario(int id, [FromBody] UsuarioActualizarDTO dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var actualizado = await _usuarioService.ModificarUsuarioAsync(id, dto);
+                if (actualizado == null)
+                    return NotFound(new { mensaje = "Usuario no encontrado" });
+
+                return Ok(actualizado);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { mensaje = ex.Message });
+            }
+        }
+
+        [HttpDelete("EliminarUsuario/{id}")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> EliminarUsuario(int id)
+        {
+            try
+            {
+                var eliminado = await _usuarioService.EliminarUsuarioAsync(id);
+                if (!eliminado)
+                    return NotFound(new { mensaje = "Usuario no encontrado" });
+
+                return Ok(new { mensaje = "Usuario eliminado correctamente" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { mensaje = ex.Message });
             }
         }
     }

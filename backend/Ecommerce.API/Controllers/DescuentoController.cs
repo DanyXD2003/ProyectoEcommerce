@@ -1,12 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using AutoMapper;
-
-using Ecommerce.Domain.Repositories;
-using Ecommerce.Domain.Entities;
-
-using Ecommerce.Application.DTOs;            // CrearDescuentoDto
-using Ecommerce.Application.Descuentos.Dtos; // ActualizarDescuentaDto, DescuentoDto
+using Ecommerce.Application.Services;
+using Ecommerce.Application.DTOs;
 
 namespace Ecommerce.API.Controllers
 {
@@ -14,31 +9,60 @@ namespace Ecommerce.API.Controllers
     [Route("api/[controller]")]
     public class DescuentoController : ControllerBase
     {
-        private readonly IDescuentoRepository _repo;
-        private readonly IMapper _mapper;
+        private readonly DescuentoService _descuentoService;
 
-        public DescuentoController(IDescuentoRepository repo, IMapper mapper)
+        public DescuentoController(DescuentoService descuentoService)
         {
-            _repo = repo;
-            _mapper = mapper;
+            _descuentoService = descuentoService;
         }
 
-        // GET: api/descuento/obtenerPorCodigo/SUMMER25 (público)
+        // 🔹 Obtener todos los descuentos (solo admin)
+        [HttpGet("obtenerTodos")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> ObtenerTodos()
+        {
+            try
+            {
+                var descuentos = await _descuentoService.GetAllAsync();
+                return Ok(descuentos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { mensaje = ex.Message });
+            }
+        }
+
+        // 🔹 Obtener descuento por ID (solo admin)
+        [HttpGet("obtenerPorId/{id}")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> ObtenerPorId(int id)
+        {
+            try
+            {
+                var descuento = await _descuentoService.GetByIdAsync(id);
+                if (descuento == null)
+                    return NotFound(new { mensaje = "Descuento no encontrado." });
+
+                return Ok(descuento);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { mensaje = ex.Message });
+            }
+        }
+
+        // 🔹 Obtener descuento por código (público)
         [HttpGet("obtenerPorCodigo/{codigo}")]
         [AllowAnonymous]
-        public async Task<IActionResult> ObtenerPorCodigo([FromRoute] string codigo)
+        public async Task<IActionResult> ObtenerPorCodigo(string codigo)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(codigo))
-                    return BadRequest(new { mensaje = "El código no puede estar vacío." });
+                var descuento = await _descuentoService.GetByCodigoAsync(codigo);
+                if (descuento == null)
+                    return NotFound(new { mensaje = "Descuento no encontrado o inactivo." });
 
-                var entity = await _repo.GetByCodigoAsync(codigo.Trim());
-                if (entity is null)
-                    return NotFound(new { mensaje = $"No se encontró el descuento con código '{codigo}'." });
-
-                var dto = _mapper.Map<DescuentoDto>(entity);
-                return Ok(dto);
+                return Ok(descuento);
             }
             catch (Exception ex)
             {
@@ -46,105 +70,77 @@ namespace Ecommerce.API.Controllers
             }
         }
 
-        // POST: api/descuento/crearDescuento (solo admin)
-        [HttpPost("crearDescuento")]
+        // 🔹 Crear descuento (admin)
+        [HttpPost("crear")]
         [Authorize(Roles = "admin")]
-        public async Task<IActionResult> CrearDescuento([FromBody] CrearDescuentoDto dto)
+        public async Task<IActionResult> Crear([FromBody] CrearDescuentoDto dto)
         {
             if (!ModelState.IsValid)
-                return ValidationProblem(ModelState);
+                return BadRequest(ModelState);
 
             try
             {
-                // Validaciones de caso de uso (sin servicio)
-                if (string.IsNullOrWhiteSpace(dto.Codigo))
-                    return BadRequest(new { mensaje = "El código no puede estar vacío." });
-
-                if (!ValidarFechasYPorcentaje(dto.FechaInicio, dto.FechaFin, dto.Porcentaje, out var error))
-                    return BadRequest(new { mensaje = error });
-
-                var existente = await _repo.GetByCodigoAsync(dto.Codigo.Trim());
-                if (existente is not null)
-                    return Conflict(new { mensaje = $"Ya existe un descuento con el código '{dto.Codigo}'." });
-
-                // Mapear a dominio (usa tu DescuentoProfile con ConstructUsing)
-                var entity = _mapper.Map<Descuento>(dto);
-
-                await _repo.AddAsync(entity);
-
-                var resp = _mapper.Map<DescuentoDto>(entity);
-
-                // Siguiendo tu patrón de ProductoController: 200 OK
-                return Ok(resp);
+                var descuento = await _descuentoService.CreateAsync(dto);
+                return Ok(descuento);
             }
             catch (ArgumentException ex)
             {
                 return BadRequest(new { mensaje = ex.Message });
             }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { mensaje = ex.Message });
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, new { mensaje = ex.Message });
             }
         }
 
-        // PUT: api/descuento/actualizarDescuento/{id} (solo admin)
-        [HttpPut("actualizarDescuento/{id:int}")]
+        // 🔹 Actualizar descuento (admin)
+        [HttpPut("actualizar")]
         [Authorize(Roles = "admin")]
-        public async Task<IActionResult> ActualizarDescuento([FromRoute] int id, [FromBody] ActualizarDescuentaDto dto)
+        public async Task<IActionResult> Actualizar([FromBody] ActualizarDescuentoDto dto)
         {
             if (!ModelState.IsValid)
-                return ValidationProblem(ModelState);
+                return BadRequest(ModelState);
 
             try
             {
-                if (id <= 0)
-                    return BadRequest(new { mensaje = "Id inválido." });
-
-                if (dto.Id != 0 && dto.Id != id)
-                    return BadRequest(new { mensaje = "El Id de la ruta no coincide con el del cuerpo." });
-
-                dto.Id = id;
-
-                if (string.IsNullOrWhiteSpace(dto.Codigo))
-                    return BadRequest(new { mensaje = "El código no puede estar vacío." });
-
-                if (!ValidarFechasYPorcentaje(dto.FechaInicio, dto.FechaFin, dto.Porcentaje, out var error))
-                    return BadRequest(new { mensaje = error });
-
-                // Verificar conflicto de código con otro registro
-                var conMismoCodigo = await _repo.GetByCodigoAsync(dto.Codigo.Trim());
-                if (conMismoCodigo is not null && conMismoCodigo.Id != dto.Id)
-                    return Conflict(new { mensaje = $"Ya existe otro descuento con el código '{dto.Codigo}'." });
-
-                var entity = _mapper.Map<Descuento>(dto);
-
-                await _repo.UpdateAsync(entity);
-
-                var resp = _mapper.Map<DescuentoDto>(entity);
-                return Ok(resp);
+                var descuento = await _descuentoService.UpdateAsync(dto);
+                return Ok(descuento);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { mensaje = ex.Message });
             }
             catch (ArgumentException ex)
             {
                 return BadRequest(new { mensaje = ex.Message });
             }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { mensaje = ex.Message });
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, new { mensaje = ex.Message });
             }
         }
 
-        // DELETE: api/descuento/eliminarDescuento/{id} (solo admin)
-        [HttpDelete("eliminarDescuento/{id:int}")]
+        // 🔹 Eliminar descuento (admin)
+        [HttpDelete("eliminar/{id}")]
         [Authorize(Roles = "admin")]
-        public async Task<IActionResult> EliminarDescuento([FromRoute] int id)
+        public async Task<IActionResult> Eliminar(int id)
         {
             try
             {
-                if (id <= 0)
-                    return BadRequest(new { mensaje = "Id inválido." });
-
-                await _repo.DeleteAsync(id);
-                return Ok(new { mensaje = "Descuento eliminado correctamente" });
+                await _descuentoService.DeleteAsync(id);
+                return Ok(new { mensaje = "Descuento eliminado correctamente." });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
             }
             catch (KeyNotFoundException ex)
             {
@@ -154,23 +150,6 @@ namespace Ecommerce.API.Controllers
             {
                 return StatusCode(500, new { mensaje = ex.Message });
             }
-        }
-
-        // --- Helper local (mismas reglas que en el servicio) ---
-        private static bool ValidarFechasYPorcentaje(DateTime inicio, DateTime fin, decimal porcentaje, out string? error)
-        {
-            if (porcentaje <= 0 || porcentaje > 100)
-            {
-                error = "El porcentaje debe estar entre 0 y 100.";
-                return false;
-            }
-            if (fin <= inicio)
-            {
-                error = "La fecha de fin debe ser posterior a la fecha de inicio.";
-                return false;
-            }
-            error = null;
-            return true;
         }
     }
 }
