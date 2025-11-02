@@ -1,0 +1,84 @@
+<div class="container py-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="fw-bold text-primary">Gestión de Productos</h2>
+    <button class="btn btn-success" (click)="abrirCrear()">
+      + Nuevo Producto
+    </button>
+  </div>
+
+  <table class="table table-hover table-striped shadow-sm rounded">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Precio</th>
+        <th>Activo</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let p of productos">
+        <td>{{ p.idProducto }}</td>
+        <td>{{ p.nombre }}</td>
+        <td>{{ p.descripcion }}</td>
+        <td>{{ p.precio | currency:'Q ' }}</td>
+        <td>
+          <span class="badge" [ngClass]="p.activo ? 'bg-success' : 'bg-secondary'">
+            {{ p.activo ? 'Sí' : 'No' }}
+          </span>
+        </td>
+        <td>
+          <button class="btn btn-warning btn-sm me-2" (click)="abrirEditar(p)">Editar</button>
+          <button class="btn btn-danger btn-sm" (click)="eliminar(p.idProducto)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ✅ MODAL -->
+<div id="modalProducto" class="modal-custom text-center">
+  <div class="modal-content-custom">
+
+    <h4 class="mb-3">
+      {{ esEdicion ? 'Editar Producto' : 'Nuevo Producto' }}
+    </h4>
+
+    <form>
+      <div class="mb-2">
+        <label>Nombre</label>
+        <input class="form-control" [(ngModel)]="productoForm.nombre" name="nombre">
+      </div>
+
+      <div class="mb-2">
+        <label>Descripción</label>
+        <input class="form-control" [(ngModel)]="productoForm.descripcion" name="descripcion">
+      </div>
+
+      <div class="mb-2">
+        <label>Precio</label>
+        <input type="number" class="form-control" [(ngModel)]="productoForm.precio" name="precio">
+      </div>
+
+      <div class="mb-3">
+        <label>Activo</label>
+        <select class="form-control" [(ngModel)]="productoForm.activo" name="activo">
+          <option [ngValue]="true">Sí</option>
+          <option [ngValue]="false">No</option>
+        </select>
+      </div>
+
+      <button type="button" class="btn btn-primary me-2" (click)="guardar()">
+        Guardar
+      </button>
+
+      <button type="button" class="btn btn-secondary" (click)="cerrarModal()">
+        Cancelar
+      </button>
+    </form>
+
+  </div>
+</div>

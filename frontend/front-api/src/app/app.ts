@@ -7,10 +7,11 @@ import { Productos } from "./features/productos/productos";
 import { ProfileComponent } from './features/auth/profile/profile';
 import { Carrito} from './features/carrito/carrito';
 import { AdminComponent } from './features/administracion/admin/admin';
+import { ProductosAdminComponent } from './features/administracion/productos/productos-admin/productos-admin';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Login, FormsModule, home, Productos, ProfileComponent, Carrito, AdminComponent],
+  imports: [RouterOutlet, Login, FormsModule, home, Productos, ProfileComponent, Carrito, AdminComponent, ProductosAdminComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
