@@ -20,6 +20,12 @@
           <li class="nav-item"><a routerLink="/carrito" class="nav-link text-dark-blue fw-medium">Carrito</a></li>
           <li class="nav-item"><a routerLink="/profile" class="nav-link text-dark-blue fw-medium">Perfil</a></li>
 
+        <!-- Botón Administración solo si es admin -->
+        <li class="nav-item" *ngIf="isAdmin">
+          <a routerLink="/admin" class="btn btn-outline-celeste ms-3">Administración</a>
+        </li> 
+
+
           <!-- SI NO ESTÁ LOGUEADO -->
           <li class="nav-item" *ngIf="!isLogged">
             <a routerLink="/login" class="btn btn-primary ms-3 fixed-btn">Iniciar sesión</a>

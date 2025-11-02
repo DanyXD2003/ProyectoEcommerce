@@ -7,10 +7,12 @@ import { Productos } from './features/productos/productos';
 import { recovery } from './features/auth/recovery/recovery';
 import { ProfileComponent } from './features/auth/profile/profile';
 import { Carrito } from './features/carrito/carrito';
+import { AdminComponent } from './features/administracion/admin/admin';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: home },
+  { path: 'admin', component: AdminComponent },
   { path: 'productos', component: Productos },
   { path: 'login', component: Login },
   { path: 'register', component: Register },

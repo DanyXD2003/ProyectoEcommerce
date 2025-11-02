@@ -6,10 +6,11 @@ import { home } from "./features/home/home";
 import { Productos } from "./features/productos/productos";
 import { ProfileComponent } from './features/auth/profile/profile';
 import { Carrito} from './features/carrito/carrito';
+import { AdminComponent } from './features/administracion/admin/admin';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Login, FormsModule, home, Productos, ProfileComponent, Carrito],
+  imports: [RouterOutlet, Login, FormsModule, home, Productos, ProfileComponent, Carrito, AdminComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

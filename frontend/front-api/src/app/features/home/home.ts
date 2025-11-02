@@ -14,7 +14,8 @@ import { AuthService } from '../../core/services/auth';
 export class home implements OnInit {
   isLogged = false;
   userName = '';
-
+  isAdmin: boolean = false;
+  
   constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit() {
@@ -27,6 +28,7 @@ export class home implements OnInit {
   console.log("Usuario recuperado:", user);
 
   this.userName = user ? (user.nombre || user.correo || 'Usuario') : '';
+  this.isAdmin = user?.rol === 'admin';  // <-- nueva propiedad
 }
 
 
