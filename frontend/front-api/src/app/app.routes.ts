@@ -3,19 +3,19 @@ import { Login } from './features/auth/login/login';
 import { Register } from './features/auth/register/register';
 import { AuthGuard } from './core/guards/auth.guard';
 import { home } from './features/home/home';
-import { productos } from './features/productos/productos';
+import { Productos } from './features/productos/productos';
 import { recovery } from './features/auth/recovery/recovery';
 import { ProfileComponent } from './features/auth/profile/profile';
-import { carrito } from './features/carrito/carrito';
+import { Carrito } from './features/carrito/carrito';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: home },
-  { path: 'productos', component: productos },
+  { path: 'productos', component: Productos },
   { path: 'login', component: Login },
   { path: 'register', component: Register },
   { path: 'recovery', component: recovery },
   { path: 'profile', component: ProfileComponent },
-  { path: 'carrito', component: carrito },
+  { path: 'carrito', component: Carrito },
   { path: 'dashboard', component: Register, canActivate: [AuthGuard] }
 ];

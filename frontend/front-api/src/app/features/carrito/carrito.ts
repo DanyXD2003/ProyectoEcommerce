@@ -1,42 +1,69 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-
+import { CarritoService, CarritoDto } from './carrito.service';
+import { AuthService } from '../../core/services/auth';
 
 @Component({
-  selector: 'app-cart',
+  selector: 'app-carrito',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './carrito.html',
   styleUrls: ['./carrito.css']
 })
-export class carrito {
-  isLogged = true; // Simulación de usuario loggeado
-  cartItems = [
-    { nombre: 'Auriculares inalámbricos', precio: 150, cantidad: 2 },
-    { nombre: 'Smartwatch FitLife', precio: 80, cantidad: 1 },
-    { nombre: 'Mochila UrbanTech', precio: 200, cantidad: 1 },
-  ];
+export class Carrito implements OnInit {
 
-  get total() {
-    return this.cartItems.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
+  isLogged = false;
+  carrito!: CarritoDto;
+
+  constructor(
+    private carritoService: CarritoService,
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  ngOnInit() {
+    this.isLogged = this.authService.isLoggedIn();
+
+    if (!this.isLogged) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    this.cargarCarrito();
   }
 
-  constructor(private router: Router) {}
+  cargarCarrito() {
+    this.carritoService.obtenerCarrito().subscribe({
+      next: data => {
+        this.carrito = data;
+      },
+      error: err => {
+        console.error("Error cargando carrito", err);
+      }
+    });
+  }
 
-  eliminarItem(index: number) {
-    this.cartItems.splice(index, 1);
+  eliminarItem(productoId: number) {
+    this.carritoService.eliminarProducto(productoId).subscribe(() => {
+      this.cargarCarrito();
+    });
+  }
+
+  vaciar() {
+    this.carritoService.vaciarCarrito().subscribe(() => {
+      this.cargarCarrito();
+    });
   }
 
   irAPagar() {
-  alert(`Proceder a pagar: Total Q. ${this.total}`);
+    alert("Aquí iría la página de pago real");
   }
 
   logout() {
-  console.log('Logout simulado');
-  this.router.navigate(['/home']);
+    this.authService.logout();
+    this.router.navigate(['/home']);
   }
-
 }

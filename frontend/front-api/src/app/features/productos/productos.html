@@ -1,40 +1,82 @@
 <div class="container-fluid min-vh-100 d-flex flex-column">
   <!-- Header -->
-  <header class="d-flex justify-content-between align-items-center py-3 px-4 border-bottom sticky-top bg-light">
-    <div class="d-flex align-items-center text-dark-blue">
-      <svg width="36" height="36" fill="currentColor" viewBox="0 0 48 48"><path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"/></svg>
-      <h2 class="ms-2 fw-bold">MisVentas</h2>
-    </div>
-    <nav class="d-none d-md-flex gap-3">
-      <a routerLink="/home" class="nav-link text-dark-blue text-decoration-none">Inicio</a>
-      <a routerLink="/productos" class="text-dark-blue text-decoration-none">Productos</a>
-      <a routerLink="/carrito" class="text-dark-blue text-decoration-none">Carrito</a>
-      <a routerLink="/profile" class="text-dark-blue text-decoration-none">Perfil</a>
-    </nav>
-    <button routerLink="/login" class="btn btn-celeste text-white fw-bold">Iniciar Sesión</button>
-  </header>
+  <header class="navbar navbar-expand-lg navbar-light bg-white shadow-sm px-4 sticky-top">
+  <a class="navbar-brand d-flex align-items-center text-dark-blue fw-bold" routerLink="/home">
+    <svg width="36" height="36" fill="currentColor" viewBox="0 0 48 48">
+      <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"/>
+    </svg>
+    <span class="ms-2">MisVentas</span>
+  </a>
 
-  <!-- Categorías -->
-  <section class="py-2 border-bottom bg-light sticky-top">
-    <div class="d-flex flex-wrap justify-content-center gap-2">
-      <button *ngFor="let cat of categorias" class="btn" [ngClass]="{'btn-celeste text-white': cat==='Electrónica','btn-outline-primary': cat!=='Electrónica'}">{{cat}}</button>
-    </div>
-  </section>
+  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+    <span class="navbar-toggler-icon"></span>
+  </button>
 
-  <!-- Productos -->
-  <main class="flex-grow-1 py-4 px-3">
-    <div class="row g-3">
-      <div class="col-6 col-md-3" *ngFor="let prod of productos">
-        <div class="card h-100 border rounded-4 shadow-sm">
-          <div class="ratio ratio-1x1" [ngStyle]="{'background-image':'url('+prod.imagen+')', 'background-size':'cover', 'background-position':'center'}"></div>
-          <div class="card-body d-flex flex-column">
-            <h5 class="card-title text-dark-blue">{{prod.nombre}}</h5>
-            <p class="text-celeste fw-semibold mt-auto">{{prod.precio}}</p>
-          </div>
+  <div id="mainNavbar" class="collapse navbar-collapse">
+    <ul class="navbar-nav ms-auto gap-2">
+      <li class="nav-item"><a routerLink="/home" class="nav-link">Inicio</a></li>
+      <li class="nav-item"><a routerLink="/productos" class="nav-link">Productos</a></li>
+      <li class="nav-item"><a routerLink="/carrito" class="nav-link">Carrito</a></li>
+      <li class="nav-item" *ngIf="!isLogged">
+        <a routerLink="/login" class="btn btn-primary">Login</a>
+      </li>
+
+      <li class="nav-item dropdown" *ngIf="isLogged">
+        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+          {{ userName }}
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" routerLink="/profile">Perfil</a></li>
+          <li><button class="dropdown-item text-danger" (click)="logout()">Salir</button></li>
+        </ul>
+      </li>
+    </ul>
+    <div class="category-bar bg-light py-2 px-3 d-flex gap-2 overflow-auto">
+      <button
+        class="btn"
+        [ngClass]="categoriaSeleccionada === 0 ? 'btn-primary' : 'btn-outline-primary'"
+        (click)="cargarTodos()">
+        Todos
+      </button>
+
+      <button
+        class="btn"
+        *ngFor="let c of categorias"
+        [ngClass]="categoriaSeleccionada === c.id ? 'btn-primary' : 'btn-outline-primary'"
+        (click)="filtrarPorCategoria(c.id)">
+        {{ c.nombre }}
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="flex-grow-1 py-4 px-3">
+  <div class="row g-3">
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3" *ngFor="let prod of productos">
+      <div class="card h-100 border rounded-4 shadow-sm product-card">
+        <div class="card-body d-flex flex-column">
+          <span class="badge bg-primary mb-2">{{ prod.categoriaNombre }}</span>
+
+          <h5 class="card-title text-dark-blue">{{ prod.nombre }}</h5>
+
+          <p class="text-muted small">{{ prod.descripcion }}</p>
+
+          <p class="fw-bold fs-5 mt-auto text-success">Q {{ prod.precio }}</p>
+
+          <p class="small">Stock: {{ prod.stock }}</p>
+
+          <button class="btn btn-primary mt-2" (click)="agregarAlCarrito(prod.id)">
+            Añadir al carrito
+          </button>
+
         </div>
       </div>
     </div>
-  </main>
+  </div>
+</main>
+
+
+
 
   <!-- Footer -->
   <footer class="mt-auto bg-white border-top py-4">
