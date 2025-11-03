@@ -1,27 +1,23 @@
-# Compilación
+# 🧩 Etapa 1: Compilación
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copiar todo el backend (todas las capas)
+# Copiar todos los archivos desde la raíz del proyecto actual (Render ya está en backend/Ecommerce.API)
 COPY . .
 
-# Restaurar dependencias del proyecto principal (API)
-RUN dotnet restore ./backend/Ecommerce.API/Ecommerce.API.csproj
+# Restaurar dependencias del proyecto principal
+RUN dotnet restore Ecommerce.API.csproj
 
-# Compilar y publicar la API en modo Release
-RUN dotnet publish ./backend/Ecommerce.API/Ecommerce.API.csproj -c Release -o /app/out
+# Compilar y publicar
+RUN dotnet publish Ecommerce.API.csproj -c Release -o /app/out
 
-# Runtime (imagen más ligera para ejecución)
+# 🧩 Etapa 2: Runtime (más ligera)
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
-
-# Copiar los archivos compilados desde la etapa anterior
 COPY --from=build /app/out .
 
-# Exponer el puerto 8080 (Render usa este puerto)
+# Configuración de entorno
 EXPOSE 8080
-
-# Configurar el entorno para escuchar en ese puerto
 ENV ASPNETCORE_URLS=http://+:8080
 ENV ASPNETCORE_ENVIRONMENT=Production
 
