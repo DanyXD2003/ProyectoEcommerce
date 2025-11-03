@@ -40,6 +40,7 @@ export class AuthService {
     const data = localStorage.getItem('usuario');
     return data ? JSON.parse(data) : null;
   }
+  
 
   // Cerrar sesión
   logout(): void {

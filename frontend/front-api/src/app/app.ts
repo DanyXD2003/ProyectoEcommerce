@@ -3,13 +3,14 @@ import { RouterOutlet } from '@angular/router';
 import { Login } from "./features/auth/login/login";
 import { FormsModule } from '@angular/forms';
 import { home } from "./features/home/home";
-import { productos } from "./features/productos/productos";
+import { Productos } from "./features/productos/productos";
 import { ProfileComponent } from './features/auth/profile/profile';
-import { carrito } from './features/carrito/carrito';
+import { Carrito} from './features/carrito/carrito';
+import { AdminComponent } from './features/administracion/admin/admin';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Login, FormsModule, home, productos, ProfileComponent, carrito],
+  imports: [RouterOutlet, Login, FormsModule, home, Productos, ProfileComponent, Carrito, AdminComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

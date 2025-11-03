@@ -31,7 +31,6 @@
               <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
             </svg>
             <button class="btn btn-outline-danger d-flex align-items-center gap-2" (click)="logout()">
-              <span class="material-symbols-outlined">logout</span>
               Salir
             </button>
           </li>
@@ -41,62 +40,74 @@
   </header>
 
   <!-- Contenido del carrito -->
-  <section class="container py-5">
+  <section class="container py-5" *ngIf="carrito">
     <div class="row g-4">
 
-      <!-- Card 1: Productos en carrito -->
+      <!-- Tabla del carrito -->
       <div class="col-12">
         <div class="card shadow-sm rounded-4 p-4">
           <h5 class="text-dark-blue fw-bold mb-3">Mi Carrito</h5>
+
           <table class="table table-hover align-middle">
             <thead>
               <tr>
-                <th>Nombre Producto</th>
-                <th>Precio Unidad</th>
+                <th>Producto</th>
+                <th>Precio</th>
                 <th>Cantidad</th>
                 <th>Subtotal</th>
                 <th>Acción</th>
               </tr>
             </thead>
+
             <tbody>
-              <tr *ngFor="let item of cartItems; let i = index">
-                <td>{{ item.nombre }}</td>
-                <td>Q. {{ item.precio }}</td>
+              <tr *ngFor="let item of carrito.detalles">
+                <td>{{ item.productoNombre }}</td>
+                <td>Q. {{ item.precioUnitario }}</td>
                 <td>{{ item.cantidad }}</td>
-                <td>Q. {{ item.precio * item.cantidad }}</td>
+                <td>Q. {{ item.subtotal }}</td>
                 <td>
-                  <button class="btn btn-outline-danger btn-sm" (click)="eliminarItem(i)">Eliminar</button>
+                  <button class="btn btn-outline-danger btn-sm" (click)="eliminarItem(item.productoId)">
+                    Eliminar
+                  </button>
                 </td>
               </tr>
             </tbody>
           </table>
-        </div>
-      </div>
 
-      <!-- Card 2: Resumen del pedido -->
-      <div class="col-12 col-lg-6">
-        <div class="card shadow-sm rounded-4 p-4">
-          <h5 class="text-dark-blue fw-bold mb-3">Resumen del pedido</h5>
-          <p>Total: <strong>Q. {{ total }}</strong></p>
-          <div class="d-flex gap-2 flex-wrap">
-            <button class="btn btn-outline-celeste" routerLink="/productos">Seguir comprando</button>
-            <button class="btn btn-primary" (click)="irAPagar()">Ir a pagar</button>
+          <div *ngIf="carrito.detalles.length === 0" class="text-center py-3 text-muted">
+            Tu carrito está vacío 
           </div>
         </div>
       </div>
 
-      <!-- Card 3: Información de pago -->
+      <!-- Resumen del pedido -->
+      <div class="col-12 col-lg-6">
+        <div class="card shadow-sm rounded-4 p-4">
+          <h5 class="text-dark-blue fw-bold mb-3">Resumen del pedido</h5>
+          <p>Total: <strong>Q. {{ carrito.total }}</strong></p>
+          <div class="d-flex gap-2 flex-wrap">
+            <button class="btn btn-outline-celeste" routerLink="/productos">Seguir comprando</button>
+            <button class="btn btn-primary" (click)="irAPagar()">Ir a pagar</button>
+            <button class="btn btn-danger" (click)="vaciar()" *ngIf="carrito.detalles.length > 0">Vaciar carrito</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Información pago -->
       <div class="col-12 col-lg-6">
         <div class="card shadow-sm rounded-4 p-4">
           <h5 class="text-dark-blue fw-bold mb-3">Información de pago</h5>
+
           <div class="mb-3">
             <label class="form-label fw-semibold">Nombre en tarjeta</label>
             <input class="form-control" placeholder="Nombre completo">
           </div>
+
           <div class="mb-3">
             <label class="form-label fw-semibold">Número de tarjeta</label>
             <input class="form-control" placeholder="XXXX-XXXX-XXXX-XXXX">
           </div>
+
           <div class="row g-3 mb-3">
             <div class="col-6">
               <label class="form-label fw-semibold">Fecha expiración</label>
@@ -107,6 +118,7 @@
               <input class="form-control" placeholder="123">
             </div>
           </div>
+
           <button class="btn btn-primary w-100" (click)="irAPagar()">Pagar ahora</button>
         </div>
       </div>
@@ -114,11 +126,17 @@
     </div>
   </section>
 
+  <!-- Mientras carga -->
+  <section class="container py-5 text-center" *ngIf="!carrito">
+    <div class="spinner-border text-primary"></div>
+    <p class="mt-2">Cargando carrito...</p>
+  </section>
+
   <!-- Footer -->
   <footer class="bg-white border-top py-4 mt-auto">
     <div class="container d-flex flex-column flex-sm-row justify-content-between align-items-center">
       <div class="d-flex align-items-center gap-2 text-dark-blue">
-        <svg fill="currentColor" width="24" height="24" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <svg fill="currentColor" width="24" height="24" viewBox="0 0 48 48">
           <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"></path>
         </svg>
         <span class="fw-bold">MisVentas</span>
