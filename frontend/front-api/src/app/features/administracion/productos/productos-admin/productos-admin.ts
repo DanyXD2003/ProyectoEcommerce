@@ -17,7 +17,7 @@ export class ProductosAdminComponent implements OnInit {
   productos: any[] = [];
   categorias: any[] = [];
 
-  apiUrl = 'http://localhost:5000/api/Producto';
+  apiUrl = 'https://proyectoecommerceback.onrender.com/api/Producto';
 
   productoForm = {
     idProducto: 0,
@@ -54,7 +54,7 @@ export class ProductosAdminComponent implements OnInit {
   }
 
   cargarCategorias() {
-    this.http.get('http://localhost:5000/api/Categoria/obtenerTodas').subscribe((res: any) => {
+    this.http.get('https://proyectoecommerceback.onrender.com/api/Categoria/obtenerTodas').subscribe((res: any) => {
       console.log("CATEGORIAS:", res); // ✅ ver si vienen datos
       this.categorias = res;
     });

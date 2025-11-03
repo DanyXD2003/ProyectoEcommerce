@@ -11,14 +11,14 @@
   "profiles": {
     "http": {
       "commandName": "Project",
-      "applicationUrl": "http://localhost:5000",
+      "applicationUrl": "https://proyectoecommerce-97hq.onrender.com",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
     "https": {
       "commandName": "Project",
-      "applicationUrl": "https://localhost:7000;http://localhost:5000",
+      "applicationUrl": "https://localhost:7000;https://proyectoecommerce-97hq.onrender.com",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

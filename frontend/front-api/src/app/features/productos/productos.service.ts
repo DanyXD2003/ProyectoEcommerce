@@ -19,7 +19,7 @@ export interface ProductoDto {
 })
 export class ProductoService {
 
-  private baseUrl = 'http://localhost:5000/api';
+  private baseUrl = 'https://proyectoecommerceback.onrender.com/api';
 
   constructor(private http: HttpClient) {}
 

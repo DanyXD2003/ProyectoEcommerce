@@ -14,7 +14,7 @@ import { RouterLink, RouterModule } from '@angular/router';
 export class UsuarioAdminComponent implements OnInit {
 
   usuarios: any[] = [];
-  apiUrl = 'http://localhost:5000/api/usuario';
+  apiUrl = 'https://proyectoecommerceback.onrender.com/api/usuario';
 
   usuarioForm = {
     id: 0,

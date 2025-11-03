@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class CategoriaService {
 
-  private baseUrl = 'http://localhost:5000/api/Categoria';
+  private baseUrl = 'https://proyectoecommerceback.onrender.com/api/Categoria';
 
   constructor(private http: HttpClient) {}
 

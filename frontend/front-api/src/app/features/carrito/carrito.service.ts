@@ -39,7 +39,7 @@ export interface CarritoDto {
 })
 export class CarritoService {
 
-  private baseUrl = 'http://localhost:5000/api/carrito';
+  private baseUrl = 'https://proyectoecommerceback.onrender.com/api/carrito';
 
   constructor(private http: HttpClient) {}
 
@@ -83,7 +83,7 @@ export class CarritoService {
   crearPedido(direccionId: number, metodoPagoId: number, tipoPago: string) {
     const body = { direccionId, metodoPagoId, tipoPago };
     return this.http.post(
-      `http://localhost:5000/api/pedido/crear`,
+      `https://proyectoecommerceback.onrender.com/api/pedido/crear`,
       body,
       this.getAuthHeaders()
     );

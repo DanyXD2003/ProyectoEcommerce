@@ -17,7 +17,7 @@ export interface UsuarioResponse {
 })
 export class ProfileService {
 
-  private apiUrl = 'http://localhost:5000/api';
+  private apiUrl = 'https://proyectoecommerceback.onrender.com/api';
 
   constructor(private http: HttpClient) {}
 

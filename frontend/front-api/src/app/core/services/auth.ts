@@ -40,13 +40,13 @@ export class AuthService {
 
 
   login(credentials: { Correo: string; Contrasena: string }): Observable<any> {
-      const url = `http://localhost:5000/api/usuario/login`; 
+      const url = `https://proyectoecommerceback.onrender.com/api/usuario/login`; 
 
       return this.http.post<any>(url, credentials);
     }
 
   register(userData: any): Observable<any> {
-    const url = `http://localhost:5000/api/usuario/registrar`; 
+    const url = `https://proyectoecommerceback.onrender.com/api/usuario/registrar`; 
     return this.http.post<any>(url, userData);
   }
 

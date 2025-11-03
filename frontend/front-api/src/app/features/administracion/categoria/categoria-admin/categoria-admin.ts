@@ -16,7 +16,7 @@ export class CategoriaAdminComponent implements OnInit {
 
   categorias: any[] = [];
 
-  apiUrl = 'http://localhost:5000/api/Categoria';
+  apiUrl = 'https://proyectoecommerceback.onrender.com/api/Categoria';
 
   categoriaForm = {
     id: 0,
