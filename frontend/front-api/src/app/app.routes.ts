@@ -12,7 +12,18 @@ import { AdminComponent } from './features/administracion/admin/admin';
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: home },
-  { path: 'admin', component: AdminComponent },
+  {
+    path: 'admin',
+    component: AdminComponent,
+    children: [
+      {
+        path: 'productos',
+        loadComponent: () =>
+          import('./features/administracion/productos/productos-admin/productos-admin')
+          .then(m => m.ProductosAdminComponent)
+      }
+    ]
+  },
   { path: 'productos', component: Productos },
   { path: 'login', component: Login },
   { path: 'register', component: Register },

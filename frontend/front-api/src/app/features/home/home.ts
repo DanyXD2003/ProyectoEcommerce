@@ -28,7 +28,9 @@ export class home implements OnInit {
   console.log("Usuario recuperado:", user);
 
   this.userName = user ? (user.nombre || user.correo || 'Usuario') : '';
-  this.isAdmin = user?.rol === 'admin';  // <-- nueva propiedad
+  const Role = this.authService.getUserRole();
+  console.log("ROL desde token:", Role);
+  this.isAdmin = Role === 'admin';
 }
 
 

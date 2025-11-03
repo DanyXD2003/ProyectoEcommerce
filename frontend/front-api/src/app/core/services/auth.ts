@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
+import { jwtDecode } from 'jwt-decode';
+//import { jwtDecode } from "../../../../node_modules/jwt-decode/build/esm/index";
+
 
 
 @Injectable({
@@ -15,6 +18,26 @@ export class AuthService {
     token: 'mock-jwt-token'
   };*/
   constructor(private http: HttpClient) {}
+
+  getUserRole(): string | null {
+    const token = this.getToken();
+    if (!token) return null;
+
+    try {
+      const decoded: any = jwtDecode(token);
+      console.log(decoded);
+
+      // Detecta el claim largo de .NET
+      const roleClaim = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+
+      return roleClaim || null;
+
+    } catch (e) {
+      console.error("Error decodificando token:", e);
+      return null;
+    }
+  }
+
 
   login(credentials: { Correo: string; Contrasena: string }): Observable<any> {
       const url = `http://localhost:5000/api/usuario/login`; 
