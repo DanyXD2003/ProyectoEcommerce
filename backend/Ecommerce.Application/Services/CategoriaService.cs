@@ -86,7 +86,7 @@ namespace Ecommerce.Application.Services
                 throw new KeyNotFoundException("Categoría no encontrada.");
 
             // Validar si tiene productos asociados
-            bool tieneProductos = await _context.Productos.AnyAsync(p => p.CategoriaId == id);
+            bool tieneProductos = await _context.Productos.AnyAsync(p => p.CategoriaId == id && p.Activo);
             if (tieneProductos)
                 throw new InvalidOperationException("No se puede eliminar la categoría porque tiene productos asociados.");
 

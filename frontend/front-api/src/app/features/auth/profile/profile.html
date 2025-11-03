@@ -119,6 +119,78 @@
     </div>
   </div>
 
+  <!-- MÉTODOS DE PAGO -->
+<div class="card shadow-sm mb-4 rounded-4">
+  <div class="card-body">
+    <h5 class="card-title text-dark-blue fw-bold mb-3">Mis Métodos de Pago</h5>
+
+    <table class="table table-hover" *ngIf="(metodosPago ?? []).length > 0">
+      <thead>
+        <tr>
+          <th>Titular</th>
+          <th>Tarjeta</th>
+          <th>Expira</th>
+          <th style="width: 120px;">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let m of metodosPago">
+          <td>{{ m.banco }}</td>
+          <td>{{ m.numeroToken}}</td>
+          <td>{{ m.fechaExpiracion }}</td>
+
+          <td>
+            <button class="btn btn-outline-danger btn-sm" (click)="eliminarMetodoPago(m.id)">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p *ngIf="metodosPago?.length === 0" class="text-muted">
+      No tienes métodos de pago guardados.
+    </p>
+
+    <hr>
+
+    <!-- FORM AGREGAR -->
+    <h6 class="fw-bold mb-3">Agregar método de pago</h6>
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Nombre del Banco *</label>
+        <input class="form-control" [(ngModel)]="nuevoMetodoPago.nombreTitular">
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Número de Tarjeta *</label>
+        <input class="form-control" [(ngModel)]="nuevoMetodoPago.numeroTarjeta">
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Mes Exp.</label>
+        <input class="form-control" [(ngModel)]="nuevoMetodoPago.mesExp" type="number">
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Año Exp.</label>
+        <input class="form-control" [(ngModel)]="nuevoMetodoPago.anioExp" type="number">
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">CVV</label>
+        <input class="form-control" [(ngModel)]="nuevoMetodoPago.cvv" type="number">
+      </div>
+    </div>
+
+    <button class="btn btn-primary w-100 mt-3" (click)="agregarMetodoPago()">
+      Guardar Método
+    </button>
+
+  </div>
+</div>
+
   <!-- PEDIDOS -->
   <div class="card shadow-sm rounded-4">
     <div class="card-body">

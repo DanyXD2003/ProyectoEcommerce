@@ -1,0 +1,86 @@
+<div class="container py-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="fw-bold text-primary">Gestión de Usuarios</h2>
+    <button class="btn btn-success" (click)="abrirCrear()">
+      + Nuevo Usuario
+    </button>
+  </div>
+
+  <table class="table table-hover table-striped shadow-sm rounded">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Apellido</th>
+        <th>Correo</th>
+        <th>Rol</th>
+        <th>Fecha Registro</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let u of usuarios">
+        <td>{{ u.idUsuario }}</td>
+        <td>{{ u.nombre }}</td>
+        <td>{{ u.apellido }}</td>
+        <td>{{ u.correo }}</td>
+        <td>{{ u.rol }}</td>
+        <td>{{ u.fechaRegistro | date:'short' }}</td>
+        <td>
+          <button class="btn btn-warning btn-sm me-2" (click)="abrirEditar(u)">Editar</button>
+          <button class="btn btn-danger btn-sm" (click)="eliminar(u.idUsuario)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal -->
+<div id="modalUsuario" class="modal-custom text-center">
+  <div class="modal-content-custom">
+    <h4 class="mb-3">
+      {{ esEdicion ? 'Editar Usuario' : 'Nuevo Usuario' }}
+    </h4>
+
+    <form>
+      <div class="mb-2">
+        <label>Nombre</label>
+        <input class="form-control" [(ngModel)]="usuarioForm.nombre" name="nombre">
+      </div>
+
+      <div class="mb-2">
+        <label>Apellido</label>
+        <input class="form-control" [(ngModel)]="usuarioForm.apellido" name="apellido">
+      </div>
+
+      <div class="mb-2">
+        <label>Correo</label>
+        <input type="email" class="form-control" [(ngModel)]="usuarioForm.correo" name="correo">
+      </div>
+
+      <div class="mb-2" *ngIf="!esEdicion">
+        <label>Contraseña</label>
+        <input type="password" class="form-control" [(ngModel)]="usuarioForm.contrasena" name="contrasena">
+      </div>
+
+      <div class="mb-3">
+        <label>Rol</label>
+        <select class="form-control" [(ngModel)]="usuarioForm.rol" name="rol">
+          <option value="admin">Admin</option>
+          <option value="empleado">Empleado</option>
+          <option value="cliente">Cliente</option>
+        </select>
+      </div>
+
+      <button type="button" class="btn btn-primary me-2" (click)="guardar()">
+        Guardar
+      </button>
+
+      <button type="button" class="btn btn-secondary" (click)="cerrarModal()">
+        Cancelar
+      </button>
+    </form>
+  </div>
+</div>

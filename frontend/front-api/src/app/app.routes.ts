@@ -21,6 +21,18 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/administracion/productos/productos-admin/productos-admin')
           .then(m => m.ProductosAdminComponent)
+      },
+      {
+      path: 'categorias',
+        loadComponent: () =>
+          import('./features/administracion/categoria/categoria-admin/categoria-admin')
+          .then(m => m.CategoriaAdminComponent)
+      },
+      {
+      path: 'usuarios',
+      loadComponent: () =>
+          import('./features/administracion/usuarios/usuario-admin/usuario-admin')
+          .then(m => m.UsuarioAdminComponent)
       }
     ]
   },

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { CategoriaService } from '../../categoria/categoria.service';
 
 @Component({
   selector: 'app-productos-admin',
@@ -14,30 +15,55 @@ import { FormsModule } from '@angular/forms';
 export class ProductosAdminComponent implements OnInit {
 
   productos: any[] = [];
+  categorias: any[] = [];
+
   apiUrl = 'http://localhost:5000/api/Producto';
 
-  // Campos para modal
   productoForm = {
     idProducto: 0,
     nombre: '',
     descripcion: '',
     precio: 0,
+    categoriaId: 0,
     activo: true
   };
 
   esEdicion = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private categoriaService: CategoriaService) {}
 
   ngOnInit() {
     this.cargarProductos();
+    this.cargarCategorias();
   }
+
+  /*cargarProductos() {
+    this.http.get(`${this.apiUrl}/obtenerTodosAdmin`).subscribe((res: any) => {
+      console.log("productos:", res); // ✅ ver si vienen datos
+      this.productos = res;
+    });
+  }*/
 
   cargarProductos() {
     this.http.get(`${this.apiUrl}/obtenerTodosAdmin`).subscribe((res: any) => {
-      this.productos = res;
+      this.productos = res.map((p: any) => ({
+        ...p,
+        idProducto: p.id // <--- mapeo aquí
+      }));
     });
   }
+
+  cargarCategorias() {
+    this.http.get('http://localhost:5000/api/Categoria/obtenerTodas').subscribe((res: any) => {
+      console.log("CATEGORIAS:", res); // ✅ ver si vienen datos
+      this.categorias = res;
+    });
+  }
+
+  /*cargarCategorias() {
+    this.categoriaService.obtenerTodas()
+      .subscribe((res: any) => this.categorias = res);
+  }*/
 
   abrirCrear() {
     this.esEdicion = false;
@@ -46,6 +72,7 @@ export class ProductosAdminComponent implements OnInit {
       nombre: '',
       descripcion: '',
       precio: 0,
+      categoriaId: 0,
       activo: true
     };
     (document.getElementById("modalProducto") as any).style.display = "block";
@@ -58,8 +85,8 @@ export class ProductosAdminComponent implements OnInit {
   }
 
   guardar() {
-    if (!this.productoForm.nombre || this.productoForm.precio <= 0) {
-      alert("Nombre y precio obligatorios");
+    if (!this.productoForm.nombre || this.productoForm.precio <= 0 || this.productoForm.categoriaId === 0) {
+      alert("Nombre, precio y categoría obligatorios");
       return;
     }
 

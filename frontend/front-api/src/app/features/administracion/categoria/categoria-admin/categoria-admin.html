@@ -1,0 +1,61 @@
+<div class="container py-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="fw-bold text-primary">Gestión de Categorías</h2>
+    <button class="btn btn-success" (click)="abrirCrear()">
+      + Nueva Categoría
+    </button>
+  </div>
+
+  <table class="table table-hover table-striped shadow-sm rounded">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let c of categorias">
+        <td>{{ c.idCategoria }}</td>
+        <td>{{ c.nombre }}</td>
+        <td>{{ c.descripcion }}</td>
+        <td>
+          <button class="btn btn-warning btn-sm me-2" (click)="abrirEditar(c)">Editar</button>
+          <button class="btn btn-danger btn-sm" (click)="eliminar(c.idCategoria)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal -->
+<div id="modalCategoria" class="modal-custom text-center">
+  <div class="modal-content-custom">
+    <h4 class="mb-3">
+      {{ esEdicion ? 'Editar Categoría' : 'Nueva Categoría' }}
+    </h4>
+
+    <form>
+      <div class="mb-2">
+        <label>Nombre</label>
+        <input class="form-control" [(ngModel)]="categoriaForm.nombre" name="nombre">
+      </div>
+
+      <div class="mb-2">
+        <label>Descripción</label>
+        <input class="form-control" [(ngModel)]="categoriaForm.descripcion" name="descripcion">
+      </div>
+
+      <button type="button" class="btn btn-primary me-2" (click)="guardar()">
+        Guardar
+      </button>
+
+      <button type="button" class="btn btn-secondary" (click)="cerrarModal()">
+        Cancelar
+      </button>
+    </form>
+  </div>
+</div>

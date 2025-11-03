@@ -14,6 +14,7 @@
         <th>Nombre</th>
         <th>Descripción</th>
         <th>Precio</th>
+        <th>Categoría</th> <!-- ✅ AGREGADO -->
         <th>Activo</th>
         <th>Acciones</th>
       </tr>
@@ -25,11 +26,16 @@
         <td>{{ p.nombre }}</td>
         <td>{{ p.descripcion }}</td>
         <td>{{ p.precio | currency:'Q ' }}</td>
+
+        <!-- ✅ Muestra Nombre categoría si existe, sino el ID -->
+        <td>{{ p.categoriaNombre ?? ('ID: ' + p.categoriaId) }}</td>
+
         <td>
           <span class="badge" [ngClass]="p.activo ? 'bg-success' : 'bg-secondary'">
             {{ p.activo ? 'Sí' : 'No' }}
           </span>
         </td>
+
         <td>
           <button class="btn btn-warning btn-sm me-2" (click)="abrirEditar(p)">Editar</button>
           <button class="btn btn-danger btn-sm" (click)="eliminar(p.idProducto)">Eliminar</button>
@@ -61,6 +67,17 @@
       <div class="mb-2">
         <label>Precio</label>
         <input type="number" class="form-control" [(ngModel)]="productoForm.precio" name="precio">
+      </div>
+
+      <!-- ✅ ✅ AGREGADO: SELECT DE CATEGORÍA -->
+      <div class="mb-2">
+        <label>Categoría</label>
+        <select class="form-control" [(ngModel)]="productoForm.categoriaId" name="categoriaId">
+          <option value="0" disabled>Seleccione una categoría...</option>
+          <option *ngFor="let c of categorias" [value]="c.id">
+            {{ c.nombre }}
+          </option>
+        </select>
       </div>
 
       <div class="mb-3">

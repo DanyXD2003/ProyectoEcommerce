@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CarritoService, CarritoDto } from './carrito.service';
 import { AuthService } from '../../core/services/auth';
+import { ProfileService } from '../auth/profile/profile.service';
 
 @Component({
   selector: 'app-carrito',
@@ -18,10 +19,23 @@ export class Carrito implements OnInit {
   isLogged = false;
   carrito!: CarritoDto;
 
+  // NUEVOS CAMPOS
+  codigoDescuento = "";
+  aplicando = false;
+  pagando = false;
+
+  direcciones: any[] = [];
+  metodosPago: any[] = [];
+
+  direccionSeleccionada = 0;
+  metodoSeleccionado = 0;
+  tipoPago = 'tarjeta'; // tarjeta o contraEntrega
+
   constructor(
     private carritoService: CarritoService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private profileService: ProfileService   // agregado
   ) {}
 
   ngOnInit() {
@@ -33,15 +47,65 @@ export class Carrito implements OnInit {
     }
 
     this.cargarCarrito();
+    this.cargarDatosCliente();  // agregado
   }
 
   cargarCarrito() {
     this.carritoService.obtenerCarrito().subscribe({
       next: data => {
-        this.carrito = data;
+        this.carrito = data as any;
+
+        // Si el backend trae totales correctamente
+        if (data.totalConDescuento !== undefined) {
+          (this.carrito as any).total = data.totalConDescuento;
+        } else {
+          // Fallback si no viene desde backend
+          (this.carrito as any).total = data.detalles.reduce((t, d) => t + d.subtotal, 0);
+        }
       },
       error: err => {
         console.error("Error cargando carrito", err);
+      }
+    });
+  }
+
+
+
+  // NUEVO: cargar direcciones y métodos de pago
+  cargarDatosCliente() {
+    const correo = localStorage.getItem('correoUsuario');
+    if (!correo) return;
+
+    this.profileService.buscarPorCorreo(correo).subscribe({
+      next: data => {
+        this.direcciones = data.direcciones || [];
+
+        this.profileService.obtenerMetodosPago().subscribe({
+          next: m => this.metodosPago = m
+        });
+      },
+      error: err => console.log("Error cargando datos de cliente", err)
+    });
+  }
+
+  // NUEVO: aplicar descuento
+  aplicarDescuento() {
+    if (!this.codigoDescuento.trim()) {
+      alert("Ingresa un código válido");
+      return;
+    }
+
+    this.aplicando = true;
+    this.carritoService.aplicarDescuento(this.codigoDescuento).subscribe({
+      next: c => {
+        this.carrito = c;
+        this.codigoDescuento = "";
+        this.aplicando = false;
+        alert("Descuento aplicado ✔");
+      },
+      error: e => {
+        this.aplicando = false;
+        alert("Código inválido o expirado");
       }
     });
   }
@@ -58,8 +122,32 @@ export class Carrito implements OnInit {
     });
   }
 
+  // NUEVO: activar pantalla de pago
   irAPagar() {
-    alert("Aquí iría la página de pago real");
+    this.pagando = true;
+  }
+
+  // NUEVO: confirmar pedido
+  confirmarPedido() {
+    if (!this.direccionSeleccionada || !this.metodoSeleccionado) {
+      alert("Debes seleccionar dirección y método de pago");
+      return;
+    }
+
+    this.carritoService.crearPedido(
+      this.direccionSeleccionada,
+      this.metodoSeleccionado,
+      this.tipoPago
+    ).subscribe({
+      next: () => {
+        alert("Pedido creado");
+        this.router.navigate(['/profile']);
+      },
+      error: err => {
+        console.log(err);
+        alert("Error creando pedido");
+      }
+    });
   }
 
   logout() {

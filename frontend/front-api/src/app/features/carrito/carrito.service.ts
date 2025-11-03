@@ -15,13 +15,24 @@ export interface CarritoDetalleDto {
   subtotal: number;
 }
 
-export interface CarritoDto {
+/*export interface CarritoDto {
   id: number;
   fechaCreacion: Date;
   activo: boolean;
   detalles: CarritoDetalleDto[];
   total: number;
+}*/
+
+export interface CarritoDto {
+  id: number;
+  fechaCreacion: Date;
+  activo: boolean;
+  detalles: CarritoDetalleDto[];
+  totalSinDescuento: number;
+  totalDescuento: number;
+  totalConDescuento: number;
 }
+
 
 @Injectable({
   providedIn: 'root'
@@ -57,4 +68,25 @@ export class CarritoService {
   vaciarCarrito(): Observable<any> {
     return this.http.delete(`${this.baseUrl}/vaciar`, this.getAuthHeaders());
   }
+
+  // DESCUENTOS
+  aplicarDescuento(codigo: string): Observable<CarritoDto> {
+    const body = { codigo };
+    return this.http.post<CarritoDto>(
+      `${this.baseUrl}/aplicarDescuento`,
+      body,
+      this.getAuthHeaders()
+    );
+  }
+
+  // CREAR PEDIDO
+  crearPedido(direccionId: number, metodoPagoId: number, tipoPago: string) {
+    const body = { direccionId, metodoPagoId, tipoPago };
+    return this.http.post(
+      `http://localhost:5000/api/pedido/crear`,
+      body,
+      this.getAuthHeaders()
+    );
+  }
+
 }

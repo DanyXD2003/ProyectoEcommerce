@@ -63,4 +63,31 @@ export class ProfileService {
       this.getAuthHeaders()
     );
   }
+
+  // MÉTODOS DE PAGO (NUEVO)
+
+  // Obtener métodos del usuario autenticado
+  obtenerMetodosPago(): Observable<any[]> {
+    return this.http.get<any[]>(
+      `${this.apiUrl}/MetodoPago/obtenerMisMetodos`,
+      this.getAuthHeaders()
+    );
+  }
+
+  // Agregar método de pago
+  agregarMetodoPago(metodo: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.apiUrl}/MetodoPago/agregarMetodo`,
+      metodo,
+      this.getAuthHeaders()
+    );
+  }
+
+  // Eliminar método de pago
+  eliminarMetodoPago(metodoId: number): Observable<void> {
+    return this.http.delete<void>(
+      `${this.apiUrl}/MetodoPago/eliminarMetodo/${metodoId}`,
+      this.getAuthHeaders()
+    );
+  }
 }
