@@ -33,7 +33,6 @@ namespace Ecommerce.Application.Services
             // Obtener el carrito activo del usuario
             var carrito = await _context.Carritos
                 .Include(c => c.Detalles)
-                    .ThenInclude(cd => cd.Carrito)
                 .FirstOrDefaultAsync(c => c.UsuarioId == usuarioId && c.Activo);
 
             if (carrito == null || !carrito.Detalles.Any())
@@ -48,7 +47,7 @@ namespace Ecommerce.Application.Services
 
             // Validar método de pago (si aplica)
             MetodoPago? metodoPago = null;
-            if (dto.TipoPago == "Tarjeta")
+            if (dto.TipoPago.Equals("Tarjeta", StringComparison.OrdinalIgnoreCase))
             {
                 metodoPago = await _context.MetodosPago.FindAsync(dto.MetodoPagoId)
                     ?? throw new KeyNotFoundException("El método de pago seleccionado no existe.");
@@ -77,7 +76,7 @@ namespace Ecommerce.Application.Services
 
             // Guardar en BD
             await _pedidoRepository.AddAsync(pedido);
-            await _detalleRepository.AddRangeAsync(detalles);
+            await _context.SaveChangesAsync();
 
             // Desactivar carrito
             carrito.Desactivar();

@@ -9,7 +9,7 @@ namespace Ecommerce.Domain.Entities
         public int? MetodoPagoId { get; private set; } // null si pago contra entrega
         public DateTime FechaPedido { get; private set; } = DateTime.UtcNow;
         public decimal Total { get; private set; }
-        public string TipoPago { get; private set; } = "ContraEntrega"; // Por defecto
+        public string TipoPago { get; private set; }
         public string Estado { get; private set; } = "Pendiente";
 
         public Usuario Usuario { get; private set; } = null!;

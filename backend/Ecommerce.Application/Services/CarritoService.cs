@@ -132,7 +132,7 @@ namespace Ecommerce.Application.Services
             return detalleDto;
         }
 
-        // 🔹 Eliminar un producto del carrito activo
+        // Eliminar un producto del carrito activo
         public async Task EliminarProductoAsync(int usuarioId, int productoId)
         {
             var carrito = await _context.Carritos
@@ -147,7 +147,7 @@ namespace Ecommerce.Application.Services
             await _context.SaveChangesAsync();
         }
 
-        // 🔹 Vaciar carrito
+        // Vaciar carrito
         public async Task VaciarCarritoAsync(int usuarioId)
         {
             var carrito = await _context.Carritos
@@ -159,7 +159,7 @@ namespace Ecommerce.Application.Services
             await _context.SaveChangesAsync();
         }
 
-        // 🔹 Aplicar descuento por código al carrito activo
+        // Aplicar descuento por código al carrito activo
         public async Task<CarritoDto> AplicarDescuentoAsync(int usuarioId, string codigo)
         {
             if (string.IsNullOrWhiteSpace(codigo))

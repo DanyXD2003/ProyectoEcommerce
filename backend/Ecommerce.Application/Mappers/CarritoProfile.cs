@@ -10,7 +10,11 @@ namespace Ecommerce.Application.Mappers
         {
             // arrito -> CarritoDto
             CreateMap<Carrito, CarritoDto>()
-                .ForMember(dest => dest.Detalles, opt => opt.MapFrom(src => src.Detalles));
+                .ForMember(dest => dest.Detalles, opt => opt.MapFrom(src => src.Detalles))
+                .ForMember(dest => dest.TotalSinDescuento, opt => opt.MapFrom(src => src.TotalSinDescuento))
+                .ForMember(dest => dest.TotalDescuento, opt => opt.MapFrom(src => src.TotalDescuento))
+                .ForMember(dest => dest.TotalConDescuento, opt => opt.MapFrom(src => src.TotalConDescuento));
+
 
             //CarritoDetalle -> CarritoDetalleDto
             CreateMap<CarritoDetalle, CarritoDetalleDto>()
