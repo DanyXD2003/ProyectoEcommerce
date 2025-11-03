@@ -25,7 +25,8 @@ builder.Services.AddAutoMapper(
     typeof(DireccionProfile),
     typeof(ProductoProfile),
     typeof(CarritoProfile),
-    typeof(DescuentoProfile) // 🆕 se agrega el mapper de descuento
+    typeof(DescuentoProfile),
+    typeof(MetodoPagoProfile)
 );
 
 // ----------------------
@@ -45,9 +46,11 @@ builder.Services.AddScoped<ProductoService>();
 
 builder.Services.AddScoped<CarritoService>();
 
-// 🆕 Descuentos
 builder.Services.AddScoped<IDescuentoRepository, DescuentoRepository>();
 builder.Services.AddScoped<DescuentoService>();
+
+builder.Services.AddScoped<IMetodoPagoRepository, MetodoPagoRepository>();
+builder.Services.AddScoped<MetodoPagoService>();
 
 // ----------------------
 // CORS (para Angular localhost)
