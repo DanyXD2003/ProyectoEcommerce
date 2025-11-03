@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copiar todo el backend (todas las capas)
-COPY ../.. .
+COPY . .
 
 # Restaurar dependencias del proyecto principal (API)
 RUN dotnet restore ./backend/Ecommerce.API/Ecommerce.API.csproj
