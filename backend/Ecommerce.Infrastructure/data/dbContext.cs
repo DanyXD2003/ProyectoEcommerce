@@ -138,6 +138,10 @@ namespace Ecommerce.Infrastructure.Data
             modelBuilder.Entity<CarritoDetalle>().Property(cd => cd.PrecioUnitario).HasPrecision(18, 2);
             modelBuilder.Entity<Carrito>().Property(c => c.TotalDescuento).HasPrecision(18, 2);
 
+            modelBuilder.Entity<Carrito>()
+                .Property(c => c.TotalDescuento)
+                .HasPrecision(18, 2)
+                .HasDefaultValue(0);
             // ---------- PAGO ----------
             modelBuilder.Entity<Pago>().HasKey(pg => pg.Id);
         }

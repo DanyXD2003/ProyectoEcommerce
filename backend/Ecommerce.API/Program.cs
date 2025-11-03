@@ -56,7 +56,6 @@ builder.Services.AddScoped<MetodoPagoService>();
 
 builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
 builder.Services.AddScoped<IPedidoDetalleRepository, PedidoDetalleRepository>();
-
 builder.Services.AddScoped<PedidoService>();
 
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
