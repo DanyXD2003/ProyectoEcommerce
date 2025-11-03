@@ -8,7 +8,9 @@ namespace Ecommerce.Infrastructure.Data
         public EcommerceDbContext(DbContextOptions<EcommerceDbContext> options)
             : base(options) { }
 
-        // DbSets
+        // ================================
+        //           DBSETS
+        // ================================
         public DbSet<Usuario> Usuarios { get; set; } = null!;
         public DbSet<Categoria> Categorias { get; set; } = null!;
         public DbSet<Producto> Productos { get; set; } = null!;
@@ -21,91 +23,123 @@ namespace Ecommerce.Infrastructure.Data
         public DbSet<Carrito> Carritos { get; set; } = null!;
         public DbSet<CarritoDetalle> CarritoDetalles { get; set; } = null!;
 
+        // ================================
+        //           MAPEOS
+        // ================================
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Usuario
+            // ---------- USUARIO ----------
             modelBuilder.Entity<Usuario>().HasKey(u => u.Id);
+
             modelBuilder.Entity<Usuario>()
                 .HasMany(u => u.Direcciones)
                 .WithOne(d => d.Usuario)
                 .HasForeignKey(d => d.UsuarioId);
+
             modelBuilder.Entity<Usuario>()
                 .HasMany(u => u.MetodosPago)
                 .WithOne(mp => mp.Usuario)
                 .HasForeignKey(mp => mp.UsuarioId);
+
             modelBuilder.Entity<Usuario>()
                 .HasMany(u => u.Pedidos)
                 .WithOne(p => p.Usuario)
                 .HasForeignKey(p => p.UsuarioId);
 
-            // Categoria - Producto
+            // ---------- CATEGORIA / PRODUCTO ----------
             modelBuilder.Entity<Categoria>().HasKey(c => c.Id);
+
             modelBuilder.Entity<Categoria>()
                 .HasMany(c => c.Productos)
                 .WithOne(p => p.Categoria)
                 .HasForeignKey(p => p.CategoriaId);
 
-            // Producto - PedidoDetalle / CarritoDetalle
             modelBuilder.Entity<Producto>().HasKey(p => p.Id);
+
             modelBuilder.Entity<Producto>()
                 .HasMany(p => p.PedidoDetalles)
                 .WithOne(pd => pd.Producto)
                 .HasForeignKey(pd => pd.ProductoId);
+
             modelBuilder.Entity<Producto>()
                 .HasMany(p => p.CarritoDetalles)
-                .WithOne() // no hay navegación inversa en CarritoDetalle hacia Producto
+                .WithOne()
                 .HasForeignKey(cd => cd.ProductoId)
                 .IsRequired(false);
 
-            // Pedido - PedidoDetalle / Pago
+            // ---------- PEDIDO / PEDIDO DETALLE ----------
             modelBuilder.Entity<Pedido>().HasKey(p => p.Id);
+
+            // Pedido -> PedidoDetalle
             modelBuilder.Entity<Pedido>()
                 .HasMany(p => p.Detalles)
-                .WithOne(pd => pd.Pedido)
-                .HasForeignKey(pd => pd.PedidoId);
+                .WithOne(d => d.Pedido)
+                .HasForeignKey(d => d.PedidoId);
+
+            // Pedido -> Usuario
             modelBuilder.Entity<Pedido>()
-                .HasMany(p => p.Pagos)
-                .WithOne(pg => pg.Pedido)
-                .HasForeignKey(pg => pg.PedidoId);
+                .HasOne(p => p.Usuario)
+                .WithMany(u => u.Pedidos)
+                .HasForeignKey(p => p.UsuarioId);
+
+            // Pedido -> Direccion (una dirección puede tener varios pedidos)
+            modelBuilder.Entity<Pedido>()
+                .HasOne(p => p.Direccion)
+                .WithMany(d => d.Pedidos)
+                .HasForeignKey(p => p.DireccionId)
+                .IsRequired();
+
+
+            // Pedido -> MetodoPago (opcional)
+            modelBuilder.Entity<Pedido>()
+                .HasOne(p => p.MetodoPago)
+                .WithMany(mp => mp.Pedidos)
+                .HasForeignKey(p => p.MetodoPagoId)
+                .IsRequired(false);
+
+            // Pedido -> Carrito
+            modelBuilder.Entity<Pedido>()
+                .HasOne(p => p.Carrito)
+                .WithMany()
+                .HasForeignKey(p => p.CarritoId);
 
             // PedidoDetalle
             modelBuilder.Entity<PedidoDetalle>().HasKey(pd => pd.Id);
+            modelBuilder.Entity<PedidoDetalle>().Property(pd => pd.PrecioUnitario).HasPrecision(18, 2);
 
-            // Pago
-            modelBuilder.Entity<Pago>().HasKey(pg => pg.Id);
-
-            // MetodoPago
+            // ---------- METODO DE PAGO ----------
             modelBuilder.Entity<MetodoPago>().HasKey(mp => mp.Id);
 
-            // Direccion
+            // ---------- DIRECCION ----------
             modelBuilder.Entity<Direccion>().HasKey(d => d.Id);
 
-            // Descuento
+            // ---------- DESCUENTO ----------
             modelBuilder.Entity<Descuento>().HasKey(d => d.Id);
-            modelBuilder.Entity<Descuento>().Property(d => d.Porcentaje).HasPrecision(5,2);
+            modelBuilder.Entity<Descuento>().Property(d => d.Porcentaje).HasPrecision(5, 2);
 
-            // Carrito
+            // ---------- CARRITO ----------
             modelBuilder.Entity<Carrito>().HasKey(c => c.Id);
+
             modelBuilder.Entity<Carrito>()
                 .HasMany(c => c.Detalles)
                 .WithOne(cd => cd.Carrito)
                 .HasForeignKey(cd => cd.CarritoId);
 
-            // Carrito - Descuento (muchos carritos pueden tener un descuento)
+            // Carrito -> Descuento (opcional)
             modelBuilder.Entity<Carrito>()
                 .HasOne(c => c.Descuento)
                 .WithMany(d => d.Carritos)
                 .HasForeignKey(c => c.DescuentoId)
                 .IsRequired(false);
 
-            // CarritoDetalle
             modelBuilder.Entity<CarritoDetalle>().HasKey(cd => cd.Id);
+            modelBuilder.Entity<CarritoDetalle>().Property(cd => cd.PrecioUnitario).HasPrecision(18, 2);
+            modelBuilder.Entity<Carrito>().Property(c => c.TotalDescuento).HasPrecision(18, 2);
 
-            // precisiones para montos
-            modelBuilder.Entity<CarritoDetalle>().Property(cd => cd.PrecioUnitario).HasPrecision(18,2);
-            modelBuilder.Entity<Carrito>().Property(c => c.TotalDescuento).HasPrecision(18,2);
+            // ---------- PAGO ----------
+            modelBuilder.Entity<Pago>().HasKey(pg => pg.Id);
         }
     }
 }

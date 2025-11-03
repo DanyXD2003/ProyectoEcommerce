@@ -26,7 +26,9 @@ builder.Services.AddAutoMapper(
     typeof(ProductoProfile),
     typeof(CarritoProfile),
     typeof(DescuentoProfile),
-    typeof(MetodoPagoProfile)
+    typeof(MetodoPagoProfile),
+    typeof(PedidoProfile),
+    typeof(CategoriaProfile)
 );
 
 // ----------------------
@@ -51,6 +53,15 @@ builder.Services.AddScoped<DescuentoService>();
 
 builder.Services.AddScoped<IMetodoPagoRepository, MetodoPagoRepository>();
 builder.Services.AddScoped<MetodoPagoService>();
+
+builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
+builder.Services.AddScoped<IPedidoDetalleRepository, PedidoDetalleRepository>();
+
+builder.Services.AddScoped<PedidoService>();
+
+builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+builder.Services.AddScoped<CategoriaService>();
+
 
 // ----------------------
 // CORS (para Angular localhost)

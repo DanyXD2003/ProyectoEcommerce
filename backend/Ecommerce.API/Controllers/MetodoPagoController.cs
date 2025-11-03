@@ -18,11 +18,7 @@ namespace Ecommerce.API.Controllers
             _jwtService = jwtService;
         }
 
-        // ============================================================
-        //                     SECCIÓN USUARIO
-        // ============================================================
-
-        // 🔹 Obtener todos los métodos de pago del usuario autenticado
+        // Obtener todos los métodos de pago del usuario autenticado
         [HttpGet("obtenerMisMetodos")]
         [Authorize]
         public async Task<IActionResult> ObtenerMisMetodos()
@@ -41,7 +37,7 @@ namespace Ecommerce.API.Controllers
             }
         }
 
-        // 🔹 Agregar nuevo método de pago (tarjeta, etc.)
+        // Agregar nuevo método de pago (tarjeta, etc.)
         [HttpPost("agregarMetodo")]
         [Authorize]
         public async Task<IActionResult> AgregarMetodo([FromBody] CrearMetodoPagoDto dto)
@@ -71,7 +67,7 @@ namespace Ecommerce.API.Controllers
             }
         }
 
-        // 🔹 Eliminar uno de sus métodos de pago
+        // Eliminar uno de sus métodos de pago
         [HttpDelete("eliminarMetodo/{metodoId}")]
         [Authorize]
         public async Task<IActionResult> EliminarMetodo(int metodoId)
@@ -94,11 +90,7 @@ namespace Ecommerce.API.Controllers
             }
         }
 
-        // ============================================================
-        //                     SECCIÓN ADMINISTRADOR
-        // ============================================================
-
-        // 🔹 Obtener todos los métodos de pago (solo admin)
+        // Obtener todos los métodos de pago (solo admin)
         [HttpGet("admin/obtenerTodos")]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> ObtenerTodosAdmin()
@@ -114,7 +106,7 @@ namespace Ecommerce.API.Controllers
             }
         }
 
-        // 🔹 Actualizar método de pago (solo admin)
+        // Actualizar método de pago (solo admin)
         [HttpPut("admin/actualizar")]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> Actualizar([FromBody] ActualizarMetodoPagoDto dto)
@@ -141,7 +133,7 @@ namespace Ecommerce.API.Controllers
             }
         }
 
-        // 🔹 Eliminar método de pago (solo admin)
+        // Eliminar método de pago (solo admin)
         [HttpDelete("admin/eliminar/{id}")]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> EliminarAdmin(int id)

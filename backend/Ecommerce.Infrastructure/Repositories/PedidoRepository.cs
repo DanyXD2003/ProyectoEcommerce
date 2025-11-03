@@ -10,38 +10,60 @@ namespace Ecommerce.Infrastructure.Repositories
         private readonly EcommerceDbContext _context;
         public PedidoRepository(EcommerceDbContext context) => _context = context;
 
-        private static Pedido ToDomain(Pedido e) =>
-            new Pedido(e.Id, e.DireccionId, e.MetodoPagoId);
+        // Crear un pedido
+        public async Task AddAsync(Pedido pedido)
+        {
+            await _context.Pedidos.AddAsync(pedido);
+            await _context.SaveChangesAsync();
+        }
 
+        // Obtener pedido por ID (con relaciones)
         public async Task<Pedido?> GetByIdAsync(int id)
         {
-            var e = await _context.Pedidos.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
-            return e is null ? null : ToDomain(e);
+            return await _context.Pedidos
+                .Include(p => p.Detalles)
+                    .ThenInclude(d => d.Producto)
+                .Include(p => p.Direccion)
+                .Include(p => p.MetodoPago)
+                .Include(p => p.Usuario)
+                .Include(p => p.Carrito)
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task<IReadOnlyList<Pedido>> ListByUsuarioAsync(int usuarioId)
+        // Obtener todos los pedidos de un usuario
+        public async Task<IEnumerable<Pedido>> GetByUsuarioAsync(int usuarioId)
         {
-            var list = await _context.Pedidos
+            return await _context.Pedidos
+                .Include(p => p.Detalles)
+                    .ThenInclude(d => d.Producto)
+                .Include(p => p.Direccion)
+                .Where(p => p.UsuarioId == usuarioId)
+                .OrderByDescending(p => p.FechaPedido)
                 .AsNoTracking()
-                .Where(x => x.Id == usuarioId)
                 .ToListAsync();
-
-            return list.Select(ToDomain).ToList();
         }
 
-        public async Task AddAsync(Pedido p)
+        // Obtener todos los pedidos (admin)
+        public async Task<IEnumerable<Pedido>> GetAllAsync()
         {
-            _context.Pedidos.Add(p);
+            return await _context.Pedidos
+                .Include(p => p.Usuario)
+                .Include(p => p.Direccion)
+                .Include(p => p.MetodoPago)
+                .OrderByDescending(p => p.FechaPedido)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        // Actualizar un pedido (estado, total, etc.)
+        public async Task UpdateAsync(Pedido pedido)
+        {
+            _context.Pedidos.Attach(pedido);
+            _context.Entry(pedido).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(Pedido p)
-        {
-            _context.Pedidos.Attach(p);
-            _context.Entry(p).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-        }
-
+        // Eliminar pedido
         public async Task DeleteAsync(int id)
         {
             var pedido = await _context.Pedidos.FindAsync(id);

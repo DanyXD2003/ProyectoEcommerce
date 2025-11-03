@@ -7,11 +7,11 @@ namespace Ecommerce.Domain.Entities
         public DateTime FechaCreacion { get; private set; }
         public bool Activo { get; private set; } = true;
 
-        // 🔹 Campos de descuento (nuevo)
+        // Campos de descuento
         public int? DescuentoId { get; private set; }
         public decimal TotalDescuento { get; private set; } = 0;
 
-        // 🔹 Totales
+        // Totales
         public decimal TotalSinDescuento => Detalles.Sum(d => d.Subtotal);
         public decimal TotalConDescuento => Math.Max(TotalSinDescuento - TotalDescuento, 0);
 
@@ -41,7 +41,7 @@ namespace Ecommerce.Domain.Entities
                 Detalles = detalles;
         }
 
-        // 🔹 Métodos de dominio
+        // Métodos de dominio
 
         public void AplicarDescuento(Descuento descuento)
         {
@@ -54,7 +54,7 @@ namespace Ecommerce.Domain.Entities
             Descuento = descuento;
             DescuentoId = descuento.Id;
 
-            // 🧮 Calcular descuento basado en porcentaje
+            // Calcular descuento basado en porcentaje
             var descuentoCalculado = TotalSinDescuento * (descuento.Porcentaje / 100);
             TotalDescuento = Math.Round(descuentoCalculado, 2);
         }
