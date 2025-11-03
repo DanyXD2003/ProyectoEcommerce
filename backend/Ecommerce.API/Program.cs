@@ -20,22 +20,34 @@ builder.Services.AddDbContext<EcommerceDbContext>(options =>
 // ----------------------
 // AutoMapper
 // ----------------------
-builder.Services.AddAutoMapper(typeof(UsuarioProfile), typeof(DireccionProfile), typeof(ProductoProfile), typeof(CarritoProfile));
+builder.Services.AddAutoMapper(
+    typeof(UsuarioProfile),
+    typeof(DireccionProfile),
+    typeof(ProductoProfile),
+    typeof(CarritoProfile),
+    typeof(DescuentoProfile) // 🆕 se agrega el mapper de descuento
+);
 
 // ----------------------
 // Repositorios y servicios
 // ----------------------
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<UsuarioService>();
+
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<JwtService>();
+
 builder.Services.AddScoped<IDireccionRepository, DireccionRepository>();
 builder.Services.AddScoped<DireccionService>();
+
 builder.Services.AddScoped<IProductoRepository, ProductoRepository>();
 builder.Services.AddScoped<ProductoService>();
+
 builder.Services.AddScoped<CarritoService>();
 
-
+// 🆕 Descuentos
+builder.Services.AddScoped<IDescuentoRepository, DescuentoRepository>();
+builder.Services.AddScoped<DescuentoService>();
 
 // ----------------------
 // CORS (para Angular localhost)
@@ -112,7 +124,6 @@ builder.Services.AddControllers()
     {
         opt.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
-
 
 var app = builder.Build();
 

@@ -8,15 +8,14 @@ namespace Ecommerce.Application.Mappers
     {
         public UsuarioProfile()
         {
-            // Mapea UsuarioLoginDTO -> Usuario (login)
+            // Login
             CreateMap<UsuarioLoginDTO, Usuario>()
                 .ConstructUsing(dto => new Usuario(dto.Correo, dto.Correo, dto.Correo, dto.Contrasena, "Cliente"));
 
-            // Mapea Usuario -> UsuarioLoginDTO (sin contraseña)
             CreateMap<Usuario, UsuarioLoginDTO>()
                 .ForMember(dest => dest.Contrasena, opt => opt.Ignore());
 
-            //  Mapea UsuarioRegistroDTO -> Usuario (registro)
+            // Registro (cliente)
             CreateMap<UsuarioRegistroDTO, Usuario>()
                 .ConstructUsing(dto => new Usuario(
                     dto.nombre,
@@ -26,9 +25,40 @@ namespace Ecommerce.Application.Mappers
                     dto.tipoCuenta
                 ));
 
-            // (Opcional) Si luego querés devolver info al frontend:
             CreateMap<Usuario, UsuarioRegistroDTO>()
                 .ForMember(dest => dest.contrasena, opt => opt.Ignore());
+
+            // Registro (admin crea usuario)
+            CreateMap<UsuarioRegistroAdminDTO, Usuario>()
+                .ConstructUsing(dto => new Usuario(
+                    dto.Nombre,
+                    dto.Apellido ?? string.Empty,
+                    dto.Correo,
+                    dto.Contrasena,
+                    dto.Rol
+                ));
+
+            // Proyección para listar en panel admin
+            CreateMap<Usuario, UsuarioAdminDTO>();
+
+            // Actualización (admin modifica usuario)
+            // Solo actualiza: Nombre, Apellido, Correo, Rol
+            // Ignora claves, contraseña, fechas y relaciones.
+            CreateMap<UsuarioActualizarDTO, Usuario>()
+                .ForMember(d => d.Id, o => o.Ignore())
+                .ForMember(d => d.ContrasenaHash, o => o.Ignore())
+                .ForMember(d => d.FechaRegistro, o => o.Ignore())
+                .ForMember(d => d.token_recuperacion, o => o.Ignore())
+                .ForMember(d => d.fecha_expiracion_token, o => o.Ignore())
+                .ForMember(d => d.Direcciones, o => o.Ignore())
+                .ForMember(d => d.MetodosPago, o => o.Ignore())
+                .ForMember(d => d.Pedidos, o => o.Ignore());
+                
+            CreateMap<Usuario, UsuarioInfoDTO>();
+            CreateMap<Direccion, DireccionDTO>();
+            CreateMap<Pedido, PedidoResumenDTO>();
+            CreateMap<MetodoPago, MetodoPagoDTO>();
+
         }
     }
 }

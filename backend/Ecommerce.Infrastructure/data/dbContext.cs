@@ -55,11 +55,11 @@ namespace Ecommerce.Infrastructure.Data
                 .HasForeignKey(pd => pd.ProductoId);
             modelBuilder.Entity<Producto>()
                 .HasMany(p => p.CarritoDetalles)
-                .WithOne()
+                .WithOne() // no hay navegación inversa en CarritoDetalle hacia Producto
                 .HasForeignKey(cd => cd.ProductoId)
                 .IsRequired(false);
 
-            // Pedido - PedidoDetalle / Pago / Descuento
+            // Pedido - PedidoDetalle / Pago
             modelBuilder.Entity<Pedido>().HasKey(p => p.Id);
             modelBuilder.Entity<Pedido>()
                 .HasMany(p => p.Detalles)
@@ -69,9 +69,6 @@ namespace Ecommerce.Infrastructure.Data
                 .HasMany(p => p.Pagos)
                 .WithOne(pg => pg.Pedido)
                 .HasForeignKey(pg => pg.PedidoId);
-            modelBuilder.Entity<Pedido>()
-                .HasMany(p => p.Descuentos)
-                .WithMany(d => d.Pedidos); // Relación muchos a muchos
 
             // PedidoDetalle
             modelBuilder.Entity<PedidoDetalle>().HasKey(pd => pd.Id);
@@ -87,6 +84,7 @@ namespace Ecommerce.Infrastructure.Data
 
             // Descuento
             modelBuilder.Entity<Descuento>().HasKey(d => d.Id);
+            modelBuilder.Entity<Descuento>().Property(d => d.Porcentaje).HasPrecision(5,2);
 
             // Carrito
             modelBuilder.Entity<Carrito>().HasKey(c => c.Id);
@@ -95,8 +93,19 @@ namespace Ecommerce.Infrastructure.Data
                 .WithOne(cd => cd.Carrito)
                 .HasForeignKey(cd => cd.CarritoId);
 
+            // Carrito - Descuento (muchos carritos pueden tener un descuento)
+            modelBuilder.Entity<Carrito>()
+                .HasOne(c => c.Descuento)
+                .WithMany(d => d.Carritos)
+                .HasForeignKey(c => c.DescuentoId)
+                .IsRequired(false);
+
             // CarritoDetalle
             modelBuilder.Entity<CarritoDetalle>().HasKey(cd => cd.Id);
+
+            // precisiones para montos
+            modelBuilder.Entity<CarritoDetalle>().Property(cd => cd.PrecioUnitario).HasPrecision(18,2);
+            modelBuilder.Entity<Carrito>().Property(c => c.TotalDescuento).HasPrecision(18,2);
         }
     }
 }

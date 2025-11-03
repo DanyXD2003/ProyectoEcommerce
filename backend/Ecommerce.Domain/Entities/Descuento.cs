@@ -1,34 +1,40 @@
-namespace Ecommerce.Domain.Entities;
-
-public class Descuento
+namespace Ecommerce.Domain.Entities
 {
-    public int Id { get; private set; }
-    public string Codigo { get; private set; }
-    public string? Descripcion { get; private set; }
-    public decimal Porcentaje { get; private set; }
-    public DateTime FechaInicio { get; private set; }
-    public DateTime FechaFin { get; private set; }
-    public bool Activo { get; private set; }
-
-    public List<Pedido> Pedidos { get; private set; } = new();
-
-    public Descuento(string codigo, decimal porcentaje, DateTime fechaInicio, DateTime fechaFin, string? descripcion = null, bool activo = true)
+    public class Descuento
     {
-        if (string.IsNullOrWhiteSpace(codigo)) throw new ArgumentException("El código del descuento no puede estar vacío.");
-        if (porcentaje <= 0 || porcentaje > 100) throw new ArgumentException("El porcentaje debe estar entre 0 y 100.");
-        if (fechaFin <= fechaInicio) throw new ArgumentException("La fecha de fin debe ser posterior a la fecha de inicio.");
+        public int Id { get; private set; }
+        public string Codigo { get; private set; } = string.Empty;
+        public string Descripcion { get; private set; } = string.Empty;
 
-        Codigo = codigo;
-        Porcentaje = porcentaje;
-        FechaInicio = fechaInicio;
-        FechaFin = fechaFin;
-        Descripcion = descripcion;
-        Activo = activo;
-    }
+        // 🔹 Porcentaje de descuento (0–100)
+        public decimal Porcentaje { get; private set; }
+        public bool Activo { get; private set; } = true;
 
-    public Descuento(int id, string codigo, string? descripcion, decimal porcentaje, DateTime fechaInicio, DateTime fechaFin, bool activo)
-        : this(codigo, porcentaje, fechaInicio, fechaFin, descripcion, activo)
-    {
-        Id = id;
+        public List<Carrito> Carritos { get; private set; } = new();
+
+        // Constructor principal
+        public Descuento(string codigo, string descripcion, decimal porcentaje)
+        {
+            if (porcentaje <= 0 || porcentaje > 100)
+                throw new ArgumentException("El porcentaje de descuento debe ser mayor a 0 y menor o igual a 100.");
+
+            Codigo = codigo;
+            Descripcion = descripcion;
+            Porcentaje = porcentaje;
+            Activo = true;
+        }
+
+        // Rehidratación desde persistencia
+        public Descuento(int id, string codigo, string descripcion, decimal porcentaje, bool activo = true)
+        {
+            Id = id;
+            Codigo = codigo;
+            Descripcion = descripcion;
+            Porcentaje = porcentaje;
+            Activo = activo;
+        }
+
+        public void Desactivar() => Activo = false;
+        public void Activar() => Activo = true;
     }
 }
